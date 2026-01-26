@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
+import type { RouteContext } from 'next';
+
 import Database from 'better-sqlite3';
 
 const db = new Database('db/quiz.db', { readonly: true });
 
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  context: RouteContext<{ id: string }>
 ) {
   try {
-    const { id } = context.params;
+    const id = context.params.id;
 
     const row = db.prepare('SELECT * FROM questions WHERE id = ?').get(id);
 
