@@ -1,0 +1,18 @@
+{
+  "category": "Ciencia",
+  "totalQuestions": 30,
+  "levels": {
+    "niño": 10,
+    "joven": 10,
+    "adulto": 10
+  },
+  "generatedAt": "2026-01-25",
+  "topics": [
+    "Astronomía",
+    "Biología",
+    "Física",
+    "Química",
+    "Ciencias Naturales"
+  ],
+  "version": "1.0.0"
+}

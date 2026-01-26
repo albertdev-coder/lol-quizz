@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Iconos PWA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #9333ea;
+      text-align: center;
+    }
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 20px 0;
+      justify-content: center;
+    }
+    .icon-preview {
+      text-align: center;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: block;
+      margin: 10px auto;
+    }
+    button {
+      background: linear-gradient(135deg, #9333ea, #ec4899);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      display: block;
+      margin: 20px auto;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .status {
+      text-align: center;
+      margin: 20px 0;
+      font-weight: bold;
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Generador de Iconos PWA - Quiz Ciencia</h1>
+    <p style="text-align: center;">Haz clic en el botón para generar y descargar todos los iconos necesarios para la PWA.</p>
+    
+    <div class="preview" id="preview"></div>
+    
+    <button onclick="generateAllIcons()">✨ Generar Todos los Iconos</button>
+    
+    <div class="status" id="status"></div>
+    
+    <div style="margin-top: 30px; padding: 15px; background: #fef3c7; border-radius: 10px; border-left: 4px solid #f59e0b;">
+      <p><strong>📝 Instrucciones:</strong></p>
+      <ol>
+        <li>Haz clic en "Generar Todos los Iconos"</li>
+        <li>Se descargarán automáticamente 8 archivos PNG</li>
+        <li>Mueve todos los archivos a la carpeta <code>public/icons/</code></li>
+        <li>¡Listo! Tu PWA tendrá todos los iconos necesarios</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+    
+    function createIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      
+      // Fondo con gradiente vibrante (purple to pink)
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#9333ea'); // purple-600
+      gradient.addColorStop(0.5, '#c026d3'); // fuchsia-600
+      gradient.addColorStop(1, '#ec4899'); // pink-500
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // Añadir círculo blanco semitransparente de fondo
+      ctx.globalAlpha = 0.2;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      
+      // Dibujar icono de ciencia (átomo estilizado)
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const radius = size * 0.15;
+      
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = size * 0.03;
+      ctx.lineCap = 'round';
+      
+      // Órbitas del átomo
+      for (let i = 0; i < 3; i++) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate((i * Math.PI * 2) / 3);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, radius * 2.5, radius * 0.8, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+      
+      // Núcleo central
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Electrones
+      for (let i = 0; i < 3; i++) {
+        const angle = (i * Math.PI * 2) / 3;
+        const x = centerX + Math.cos(angle) * radius * 2.5;
+        const y = centerY + Math.sin(angle) * radius * 0.8;
+        
+        ctx.fillStyle = '#fbbf24'; // yellow-400
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Borde blanco del electrón
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = size * 0.015;
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.4, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      
+      return canvas;
+    }
+    
+    function downloadCanvas(canvas, filename) {
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          setTimeout(resolve, 100); // Pequeña pausa entre descargas
+        }, 'image/png', 1.0);
+      });
+    }
+    
+    async function generateAllIcons() {
+      const statusEl = document.getElementById('status');
+      const previewEl = document.getElementById('preview');
+      
+      statusEl.textContent = '🔄 Generando iconos...';
+      previewEl.innerHTML = '';
+      
+      for (let i = 0; i < sizes.length; i++) {
+        const size = sizes[i];
+        const canvas = createIcon(size);
+        
+        // Mostrar preview
+        const preview = document.createElement('div');
+        preview.className = 'icon-preview';
+        
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = 100;
+        previewCanvas.height = 100;
+        const previewCtx = previewCanvas.getContext('2d');
+        previewCtx.drawImage(canvas, 0, 0, 100, 100);
+        
+        const label = document.createElement('p');
+        label.textContent = `${size}x${size}`;
+        label.style.margin = '5px 0 0 0';
+        label.style.fontSize = '12px';
+        label.style.color = '#666';
+        
+        preview.appendChild(previewCanvas);
+        preview.appendChild(label);
+        previewEl.appendChild(preview);
+        
+        // Descargar
+        await downloadCanvas(canvas, `icon-${size}x${size}.png`);
+        
+        statusEl.textContent = `✅ Generado ${i + 1} de ${sizes.length}: icon-${size}x${size}.png`;
+      }
+      
+      statusEl.textContent = `✅ ¡Completado! Se generaron ${sizes.length} iconos. Revisa tu carpeta de descargas.`;
+    }
+    
+    // Generar previews al cargar
+    window.addEventListener('load', () => {
+      const previewEl = document.getElementById('preview');
+      [72, 192, 512].forEach(size => {
+        const canvas = createIcon(size);
+        const preview = document.createElement('div');
+        preview.className = 'icon-preview';
+        
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = 100;
+        previewCanvas.height = 100;
+        const previewCtx = previewCanvas.getContext('2d');
+        previewCtx.drawImage(canvas, 0, 0, 100, 100);
+        
+        const label = document.createElement('p');
+        label.textContent = `${size}x${size}`;
+        label.style.margin = '5px 0 0 0';
+        label.style.fontSize = '12px';
+        label.style.color = '#666';
+        
+        preview.appendChild(previewCanvas);
+        preview.appendChild(label);
+        previewEl.appendChild(preview);
+      });
+    });
+  </script>
+</body>
+</html>

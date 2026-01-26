@@ -1,0 +1,272 @@
+[
+  {
+    "id": "q-001",
+    "level": "niño",
+    "text": "¿Cuál es el planeta más grande de nuestro sistema solar?",
+    "choices": ["Marte", "Júpiter", "Saturno", "Tierra"],
+    "correctIndex": 1,
+    "explanation": "Júpiter es el planeta más grande del sistema solar, con un diámetro de aproximadamente 143,000 kilómetros.",
+    "image": null
+  },
+  {
+    "id": "q-002",
+    "level": "niño",
+    "text": "¿Qué gas respiran las plantas durante el día?",
+    "choices": ["Oxígeno", "Nitrógeno", "Dióxido de carbono", "Hidrógeno"],
+    "correctIndex": 2,
+    "explanation": "Las plantas absorben dióxido de carbono durante la fotosíntesis y liberan oxígeno.",
+    "image": null
+  },
+  {
+    "id": "q-003",
+    "level": "niño",
+    "text": "¿Cuántos huesos tiene el cuerpo humano adulto?",
+    "choices": ["186 huesos", "206 huesos", "256 huesos", "306 huesos"],
+    "correctIndex": 1,
+    "explanation": "Un adulto humano tiene aproximadamente 206 huesos en su cuerpo.",
+    "image": null
+  },
+  {
+    "id": "q-004",
+    "level": "niño",
+    "text": "¿Qué animal es conocido por cambiar de color para camuflarse?",
+    "choices": ["Tigre", "Camaleón", "Elefante", "Jirafa"],
+    "correctIndex": 1,
+    "explanation": "Los camaleones pueden cambiar el color de su piel para mezclarse con su entorno.",
+    "image": null
+  },
+  {
+    "id": "q-005",
+    "level": "niño",
+    "text": "¿Qué parte de la planta absorbe agua del suelo?",
+    "choices": ["Las hojas", "El tallo", "Las raíces", "Las flores"],
+    "correctIndex": 2,
+    "explanation": "Las raíces son las encargadas de absorber agua y nutrientes del suelo.",
+    "image": null
+  },
+  {
+    "id": "q-006",
+    "level": "niño",
+    "text": "¿Cuál es el animal terrestre más rápido?",
+    "choices": ["León", "Guepardo", "Caballo", "Canguro"],
+    "correctIndex": 1,
+    "explanation": "El guepardo puede alcanzar velocidades de hasta 120 km/h en distancias cortas.",
+    "image": null
+  },
+  {
+    "id": "q-007",
+    "level": "niño",
+    "text": "¿En qué estado se encuentra el agua cuando está congelada?",
+    "choices": ["Líquido", "Gas", "Sólido", "Plasma"],
+    "correctIndex": 2,
+    "explanation": "Cuando el agua se congela, cambia a estado sólido y forma hielo.",
+    "image": null
+  },
+  {
+    "id": "q-008",
+    "level": "niño",
+    "text": "¿Qué órgano bombea la sangre en el cuerpo humano?",
+    "choices": ["El cerebro", "El corazón", "Los pulmones", "El estómago"],
+    "correctIndex": 1,
+    "explanation": "El corazón es el órgano que bombea sangre a todo el cuerpo constantemente.",
+    "image": null
+  },
+  {
+    "id": "q-009",
+    "level": "niño",
+    "text": "¿Qué estrella es la más cercana a la Tierra?",
+    "choices": ["La Luna", "El Sol", "Venus", "Marte"],
+    "correctIndex": 1,
+    "explanation": "El Sol es la estrella más cercana a la Tierra y nos proporciona luz y calor.",
+    "image": null
+  },
+  {
+    "id": "q-010",
+    "level": "niño",
+    "text": "¿Cuántos continentes hay en la Tierra?",
+    "choices": ["5 continentes", "6 continentes", "7 continentes", "8 continentes"],
+    "correctIndex": 2,
+    "explanation": "La Tierra tiene 7 continentes: Asia, África, América del Norte, América del Sur, Europa, Oceanía y la Antártida.",
+    "image": null
+  },
+  {
+    "id": "q-011",
+    "level": "joven",
+    "text": "¿Qué proceso permite a las plantas convertir la luz solar en energía?",
+    "choices": ["Respiración celular", "Fotosíntesis", "Fermentación", "Digestión"],
+    "correctIndex": 1,
+    "explanation": "La fotosíntesis es el proceso donde las plantas usan luz solar, agua y CO2 para producir glucosa y oxígeno.",
+    "image": null
+  },
+  {
+    "id": "q-012",
+    "level": "joven",
+    "text": "¿Cuál es la velocidad de la luz en el vacío?",
+    "choices": ["200,000 km/s", "300,000 km/s", "400,000 km/s", "500,000 km/s"],
+    "correctIndex": 1,
+    "explanation": "La luz viaja a aproximadamente 300,000 kilómetros por segundo en el vacío.",
+    "image": null
+  },
+  {
+    "id": "q-013",
+    "level": "joven",
+    "text": "¿Qué elemento químico tiene el símbolo 'Fe'?",
+    "choices": ["Fósforo", "Hierro", "Flúor", "Fermio"],
+    "correctIndex": 1,
+    "explanation": "Fe es el símbolo del hierro, del latín 'ferrum'.",
+    "image": null
+  },
+  {
+    "id": "q-014",
+    "level": "joven",
+    "text": "¿Cuál es la unidad básica de la herencia genética?",
+    "choices": ["Célula", "Gen", "Tejido", "Órgano"],
+    "correctIndex": 1,
+    "explanation": "El gen es la unidad básica de herencia que contiene la información para transmitir características.",
+    "image": null
+  },
+  {
+    "id": "q-015",
+    "level": "joven",
+    "text": "¿Qué tipo de energía se almacena en los enlaces químicos?",
+    "choices": ["Energía cinética", "Energía térmica", "Energía potencial química", "Energía nuclear"],
+    "correctIndex": 2,
+    "explanation": "Los enlaces químicos almacenan energía potencial química que se libera durante las reacciones.",
+    "image": null
+  },
+  {
+    "id": "q-016",
+    "level": "joven",
+    "text": "¿Cuál es la fuerza que mantiene a los planetas en órbita alrededor del Sol?",
+    "choices": ["Magnetismo", "Fricción", "Gravedad", "Fuerza nuclear"],
+    "correctIndex": 2,
+    "explanation": "La gravedad es la fuerza de atracción que mantiene a los planetas orbitando alrededor del Sol.",
+    "image": null
+  },
+  {
+    "id": "q-017",
+    "level": "joven",
+    "text": "¿Qué escala se usa para medir la acidez o alcalinidad de una sustancia?",
+    "choices": ["Escala Richter", "Escala Celsius", "Escala de pH", "Escala Kelvin"],
+    "correctIndex": 2,
+    "explanation": "La escala de pH mide la acidez o alcalinidad, con valores de 0 (ácido) a 14 (básico).",
+    "image": null
+  },
+  {
+    "id": "q-018",
+    "level": "joven",
+    "text": "¿Cuántos electrones tiene un átomo de carbono en su configuración neutra?",
+    "choices": ["4 electrones", "6 electrones", "8 electrones", "12 electrones"],
+    "correctIndex": 1,
+    "explanation": "El carbono tiene 6 protones y, en estado neutro, 6 electrones.",
+    "image": null
+  },
+  {
+    "id": "q-019",
+    "level": "joven",
+    "text": "¿Qué organelo celular se conoce como la 'central eléctrica' de la célula?",
+    "choices": ["Núcleo", "Mitocondria", "Ribosoma", "Lisosoma"],
+    "correctIndex": 1,
+    "explanation": "Las mitocondrias producen ATP, la principal fuente de energía de la célula.",
+    "image": null
+  },
+  {
+    "id": "q-020",
+    "level": "joven",
+    "text": "¿Cuál es el compuesto químico del agua?",
+    "choices": ["HO", "H2O", "H2O2", "H3O"],
+    "correctIndex": 1,
+    "explanation": "El agua es H2O: dos átomos de hidrógeno y uno de oxígeno.",
+    "image": null
+  },
+  {
+    "id": "q-021",
+    "level": "adulto",
+    "text": "¿Qué principio de la física establece que la energía no se crea ni se destruye?",
+    "choices": ["Principio de incertidumbre", "Ley de conservación de la energía", "Teoría de la relatividad", "Principio de exclusión de Pauli"],
+    "correctIndex": 1,
+    "explanation": "La ley de conservación de la energía establece que la energía total de un sistema aislado permanece constante.",
+    "image": null
+  },
+  {
+    "id": "q-022",
+    "level": "adulto",
+    "text": "¿Qué proceso celular genera ATP sin la presencia de oxígeno?",
+    "choices": ["Respiración aeróbica", "Fermentación", "Ciclo de Krebs", "Cadena de transporte de electrones"],
+    "correctIndex": 1,
+    "explanation": "La fermentación es un proceso anaeróbico que produce ATP sin necesidad de oxígeno.",
+    "image": null
+  },
+  {
+    "id": "q-023",
+    "level": "adulto",
+    "text": "¿Cuál es la ecuación de Einstein que relaciona masa y energía?",
+    "choices": ["E=mv²", "E=mc²", "E=mgh", "E=½mv²"],
+    "correctIndex": 1,
+    "explanation": "E=mc² es la famosa ecuación de Einstein que muestra la equivalencia entre masa y energía.",
+    "image": null
+  },
+  {
+    "id": "q-024",
+    "level": "adulto",
+    "text": "¿Qué fenómeno cuántico permite a las partículas atravesar barreras aparentemente impenetrables?",
+    "choices": ["Superposición", "Efecto túnel", "Entrelazamiento", "Dualidad onda-partícula"],
+    "correctIndex": 1,
+    "explanation": "El efecto túnel cuántico permite que partículas atraviesen barreras de energía que clásicamente no podrían superar.",
+    "image": null
+  },
+  {
+    "id": "q-025",
+    "level": "adulto",
+    "text": "¿Qué estructura del ADN fue descubierta por Watson y Crick?",
+    "choices": ["Hélice simple", "Doble hélice", "Triple hélice", "Hélice cuádruple"],
+    "correctIndex": 1,
+    "explanation": "Watson y Crick descubrieron la estructura de doble hélice del ADN en 1953.",
+    "image": null
+  },
+  {
+    "id": "q-026",
+    "level": "adulto",
+    "text": "¿Qué constante fundamental determina la fuerza de la interacción electromagnética?",
+    "choices": ["Constante de Planck", "Constante de estructura fina", "Constante gravitacional", "Número de Avogadro"],
+    "correctIndex": 1,
+    "explanation": "La constante de estructura fina (aproximadamente 1/137) caracteriza la intensidad de la fuerza electromagnética.",
+    "image": null
+  },
+  {
+    "id": "q-027",
+    "level": "adulto",
+    "text": "¿Qué tipo de reacción química libera energía al entorno?",
+    "choices": ["Endotérmica", "Exotérmica", "Isotérmica", "Adiabática"],
+    "correctIndex": 1,
+    "explanation": "Las reacciones exotérmicas liberan energía, generalmente en forma de calor, al entorno.",
+    "image": null
+  },
+  {
+    "id": "q-028",
+    "level": "adulto",
+    "text": "¿Qué partícula subatómica no tiene carga eléctrica?",
+    "choices": ["Protón", "Electrón", "Neutrón", "Positrón"],
+    "correctIndex": 2,
+    "explanation": "El neutrón es una partícula subatómica sin carga eléctrica, ubicada en el núcleo atómico.",
+    "image": null
+  },
+  {
+    "id": "q-029",
+    "level": "adulto",
+    "text": "¿Qué principio de la termodinámica establece que la entropía de un sistema aislado siempre aumenta?",
+    "choices": ["Primera ley", "Segunda ley", "Tercera ley", "Ley cero"],
+    "correctIndex": 1,
+    "explanation": "La segunda ley de la termodinámica establece que la entropía (desorden) de un sistema aislado tiende a aumentar.",
+    "image": null
+  },
+  {
+    "id": "q-030",
+    "level": "adulto",
+    "text": "¿Qué científico propuso la teoría de la evolución por selección natural?",
+    "choices": ["Isaac Newton", "Albert Einstein", "Charles Darwin", "Gregor Mendel"],
+    "correctIndex": 2,
+    "explanation": "Charles Darwin propuso la teoría de la evolución mediante selección natural en su obra 'El origen de las especies' (1859).",
+    "image": null
+  }
+]

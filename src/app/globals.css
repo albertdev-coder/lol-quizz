@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colores principales vibrantes del quiz */
+  --color-coral: #ff6b6b;
+  --color-turquoise: #4ecdc4;
+  --color-yellow: #ffe66d;
+  --color-purple: #a06cd5;
+  
+  /* Gradientes y tonos */
+  --color-blue-light: #60a5fa;
+  --color-blue-dark: #2563eb;
+  --color-cyan-light: #67e8f9;
+  --color-cyan-dark: #06b6d4;
+  --color-purple-light: #c084fc;
+  --color-purple-dark: #9333ea;
+  --color-pink-light: #f9a8d4;
+  --color-pink-dark: #ec4899;
+  --color-orange-light: #fdba74;
+  --color-orange-dark: #f97316;
+  --color-yellow-light: #fef08a;
+  --color-yellow-dark: #eab308;
+  
+  /* Tonos suaves para fondos */
+  --color-purple-50: #faf5ff;
+  --color-pink-50: #fdf2f8;
+  --color-orange-50: #fff7ed;
+  --color-blue-50: #eff6ff;
+  --color-yellow-50: #fefce8;
+  
+  /* Neutrales */
+  --color-neutral-light: #fafafa;
+  --color-neutral-dark: #2d3748;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  
+  /* Variables del sistema Radix */
+  --color-background: #ffffff;
+  --color-foreground: var(--color-neutral-dark);
+  --color-card: #ffffff;
+  --color-card-foreground: var(--color-neutral-dark);
+  --color-popover: #ffffff;
+  --color-popover-foreground: var(--color-neutral-dark);
+  --color-primary: var(--color-coral);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--color-turquoise);
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #f3f4f6;
+  --color-muted-foreground: #6b7280;
+  --color-accent: var(--color-yellow);
+  --color-accent-foreground: var(--color-neutral-dark);
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: var(--color-coral);
+  
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-full: 9999px;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background: linear-gradient(135deg, var(--color-purple-50) 0%, var(--color-pink-50) 50%, var(--color-orange-50) 100%);
+  color: var(--color-foreground);
+  min-height: 100vh;
+  font-family: var(--font-outfit), system-ui, -apple-system, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+/* Utilidades personalizadas */
+.text-balance {
+  text-wrap: balance;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s infinite;
+}
+
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 2s ease-in-out infinite;
+}
+
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Clases de gradientes reutilizables */
+.bg-gradient-purple-pink {
+  background: linear-gradient(135deg, var(--color-purple-light) 0%, var(--color-pink-light) 100%);
+}
+
+.bg-gradient-blue-cyan {
+  background: linear-gradient(135deg, var(--color-blue-light) 0%, var(--color-cyan-light) 100%);
+}
+
+.bg-gradient-yellow-orange {
+  background: linear-gradient(135deg, var(--color-yellow-light) 0%, var(--color-orange-light) 100%);
+}
+
+.bg-gradient-purple-pink-strong {
+  background: linear-gradient(135deg, var(--color-purple-dark) 0%, var(--color-pink-dark) 100%);
+}
+
+.text-gradient-purple-pink-orange {
+  background: linear-gradient(90deg, var(--color-purple-dark) 0%, var(--color-pink-dark) 50%, var(--color-orange-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
