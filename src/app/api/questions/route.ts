@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const rows = db.prepare(query).all(...params);
 
     // Parse JSON fields
-    const questions = rows.map(q => ({
+    const questions = rows.map((q: any) => ({
       ...q,
       choices: JSON.parse(q.choices),
     }));

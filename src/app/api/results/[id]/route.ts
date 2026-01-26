@@ -5,10 +5,10 @@ const db = new Database('db/quiz.db', { readonly: true });
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     const row = db.prepare('SELECT * FROM results WHERE id = ?').get(id);
 

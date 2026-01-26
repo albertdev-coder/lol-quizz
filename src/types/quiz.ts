@@ -26,6 +26,7 @@ export interface UserAnswer {
 }
 
 export interface QuizResult {
+  id: string;
   totalQuestions: number;
   correctAnswers: number;
   incorrectAnswers: number;

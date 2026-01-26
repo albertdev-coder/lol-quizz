@@ -68,6 +68,7 @@ export const useQuiz = (level: QuizLevel) => {
     const score = calculateScore(correctAnswers, questions.length);
 
     return {
+      id: `result-${Date.now()}`,
       totalQuestions: questions.length,
       correctAnswers,
       incorrectAnswers: questions.length - correctAnswers,

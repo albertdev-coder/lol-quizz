@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
 
     const rows = db.prepare(query).all(...params);
 
-    const results = rows.map(r => ({
+    const results = rows.map((r: any) => ({
       ...r,
       answers: JSON.parse(r.answers),
     }));

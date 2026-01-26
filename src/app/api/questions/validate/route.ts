@@ -8,7 +8,7 @@ export async function GET() {
     const questions = db.prepare('SELECT * FROM questions').all();
 
     // Parse choices
-    const parsedQuestions = questions.map(q => ({
+    const parsedQuestions = questions.map((q: any) => ({
       ...q,
       choices: JSON.parse(q.choices),
     }));
@@ -17,21 +17,21 @@ export async function GET() {
     const metadataRows = db.prepare('SELECT key, value, type FROM metadata').all();
     const metadata: any = {};
 
-    metadataRows.forEach(row => {
+    metadataRows.forEach((row: any) => {
       if (row.type === 'json') metadata[row.key] = JSON.parse(row.value);
       else if (row.type === 'number') metadata[row.key] = Number(row.value);
       else metadata[row.key] = row.value;
     });
 
     // Validate unique IDs
-    const ids = parsedQuestions.map(q => q.id);
+    const ids = parsedQuestions.map((q: any) => q.id);
     const uniqueIds = new Set(ids);
     const hasDuplicates = ids.length !== uniqueIds.size;
-    const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
+    const duplicates = ids.filter((id: any, idx: number) => ids.indexOf(id) !== idx);
 
     // Validate level distribution
     const levelCounts: Record<string, number> = { niño: 0, joven: 0, adulto: 0 };
-    parsedQuestions.forEach(q => {
+    parsedQuestions.forEach((q: any) => {
       if (q.level !== 'mixto') {
         levelCounts[q.level] = (levelCounts[q.level] || 0) + 1;
       }
@@ -40,7 +40,7 @@ export async function GET() {
     // Validate structure
     const invalidQuestions: Array<{ id: string; issues: string[] }> = [];
 
-    parsedQuestions.forEach(q => {
+    parsedQuestions.forEach((q: any) => {
       const issues: string[] = [];
 
       if (!q.id) issues.push('Missing id');

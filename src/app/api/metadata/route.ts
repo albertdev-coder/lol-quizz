@@ -15,7 +15,7 @@ export async function GET(_request: NextRequest) {
     const metadata: any = {};
 
     // Reconstruir objeto metadata
-    rows.forEach(row => {
+    rows.forEach((row: any) => {
       if (row.type === 'json') {
         metadata[row.key] = JSON.parse(row.value);
       } else if (row.type === 'number') {

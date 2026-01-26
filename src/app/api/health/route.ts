@@ -13,13 +13,18 @@ export async function GET(_request: NextRequest) {
 
     // Leer metadata desde SQLite
     const rows = db.prepare('SELECT key, value, type FROM metadata').all();
-
     const metadata: any = {};
-    rows.forEach(row => {
-      if (row.type === 'json') metadata[row.key] = JSON.parse(row.value);
-      else if (row.type === 'number') metadata[row.key] = Number(row.value);
-      else if (row.type === 'boolean') metadata[row.key] = row.value === 'true';
-      else metadata[row.key] = row.value;
+
+    rows.forEach((row: any) => {
+      if (row.type === 'json') {
+        metadata[row.key] = JSON.parse(row.value);
+      } else if (row.type === 'number') {
+        metadata[row.key] = Number(row.value);
+      } else if (row.type === 'boolean') {
+        metadata[row.key] = row.value === 'true';
+      } else {
+        metadata[row.key] = row.value;
+      }
     });
 
     return NextResponse.json({
