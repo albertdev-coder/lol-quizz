@@ -5,11 +5,13 @@ import { QuizResult } from '@/types/quiz';
 
 const db = new Database('db/quiz.db');
 
+// -------------------------
+// POST → Guardar resultado
+// -------------------------
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validar datos básicos
     if (!body.level || typeof body.score !== 'number' || !body.answers) {
       return NextResponse.json(
         { success: false, error: 'Datos inválidos: level, score, answers requeridos' },
@@ -24,7 +26,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear objeto de resultado
     const result: QuizResult = {
       id: `result-${Date.now()}`,
       totalQuestions: body.totalQuestions || body.answers.length,
@@ -37,20 +38,18 @@ export async function POST(request: NextRequest) {
       date: new Date().toISOString(),
     };
 
-    // Insertar en SQLite
     db.prepare(`
-      INSERT INTO results (id, level, score, totalQuestions, correctAnswers, incorrectAnswers, timeSpent, date, answers)
-      VALUES (@id, @level, @score, @totalQuestions, @correctAnswers, @incorrectAnswers, @timeSpent, @date, @answers)
+      INSERT INTO results (
+        id, level, score, totalQuestions, correctAnswers,
+        incorrectAnswers, timeSpent, date, answers
+      )
+      VALUES (
+        @id, @level, @score, @totalQuestions, @correctAnswers,
+        @incorrectAnswers, @timeSpent, @date, @answers
+      )
     `).run({
       ...result,
       answers: JSON.stringify(result.answers),
-    });
-
-    console.log('Quiz result saved:', {
-      level: result.level,
-      score: result.score,
-      questions: result.totalQuestions,
-      correct: result.correctAnswers,
     });
 
     return NextResponse.json({
@@ -63,7 +62,7 @@ export async function POST(request: NextRequest) {
         level: result.level,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving quiz results:', error);
     return NextResponse.json(
       { success: false, error: 'Error al guardar el resultado', details: error.message },
@@ -72,12 +71,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// -------------------------
+// GET → Listar resultados
+// -------------------------
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const level = searchParams.get('level');
     const limit = parseInt(searchParams.get('limit') || '10', 10);
-    const sortBy = searchParams.get('sortBy') || 'date'; // date, score
+    const sortBy = searchParams.get('sortBy') || 'date';
 
     let query = 'SELECT * FROM results';
     const params: any[] = [];
@@ -87,16 +89,19 @@ export async function GET(request: NextRequest) {
       params.push(level);
     }
 
-    if (sortBy === 'score') {
-      query += ' ORDER BY score DESC';
-    } else {
-      query += ' ORDER BY date DESC';
-    }
+    query += sortBy === 'score'
+      ? ' ORDER BY score DESC'
+      : ' ORDER BY date DESC';
 
     query += ' LIMIT ?';
     params.push(limit);
 
-    const results = db.prepare(query).all(...params);
+    const rows = db.prepare(query).all(...params);
+
+    const results = rows.map(r => ({
+      ...r,
+      answers: JSON.parse(r.answers),
+    }));
 
     return NextResponse.json({
       success: true,
@@ -105,7 +110,7 @@ export async function GET(request: NextRequest) {
       showing: results.length,
       filters: { level: level || 'all', limit, sortBy },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching quiz results:', error);
     return NextResponse.json(
       { success: false, error: 'Error al obtener los resultados', details: error.message },

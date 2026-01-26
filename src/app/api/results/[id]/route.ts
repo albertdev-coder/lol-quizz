@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Database from 'better-sqlite3';
 
-const db = new Database('db/quiz.db');
+const db = new Database('db/quiz.db', { readonly: true });
 
 export async function GET(
   request: Request,
@@ -10,24 +10,23 @@ export async function GET(
   try {
     const { id } = params;
 
-    const result = db.prepare('SELECT * FROM results WHERE id = ?').get(id);
+    const row = db.prepare('SELECT * FROM results WHERE id = ?').get(id);
 
-    if (!result) {
+    if (!row) {
       return NextResponse.json(
         { success: false, error: 'Resultado no encontrado' },
         { status: 404 }
       );
     }
 
-    // Parsear el campo answers de JSON a objeto
-    const parsedResult = {
-      ...result,
-      answers: JSON.parse(result.answers),
+    const parsed = {
+      ...row,
+      answers: JSON.parse(row.answers),
     };
 
     return NextResponse.json({
       success: true,
-      data: parsedResult,
+      data: parsed,
     });
   } catch (error) {
     console.error('Error fetching result:', error);

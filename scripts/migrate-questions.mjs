@@ -3,11 +3,30 @@ import Database from 'better-sqlite3';
 import fs from 'fs';
 
 const db = new Database('db/quiz.db');
+
+console.log('📥 Migrating questions.json → SQLite...\n');
+
 const questions = JSON.parse(fs.readFileSync('data/questions.json', 'utf-8'));
 
 const insert = db.prepare(`
-  INSERT INTO questions (id, text, level, choices, correctIndex, explanation, image)
-  VALUES (@id, @text, @level, @choices, @correctIndex, @explanation, @image)
+  INSERT INTO questions (
+    id,
+    text,
+    level,
+    choices,
+    correctIndex,
+    explanation,
+    image
+  )
+  VALUES (
+    @id,
+    @text,
+    @level,
+    @choices,
+    @correctIndex,
+    @explanation,
+    @image
+  )
 `);
 
 const insertMany = db.transaction((qs) => {
@@ -26,4 +45,4 @@ const insertMany = db.transaction((qs) => {
 
 insertMany(questions);
 
-console.log(`Migrated ${questions.length} questions to SQLite ✅`);
+console.log(`✅ Migrated ${questions.length} questions to SQLite`);

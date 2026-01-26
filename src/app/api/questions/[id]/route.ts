@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Database from 'better-sqlite3';
 
-const db = new Database('db/quiz.db');
+const db = new Database('db/quiz.db', { readonly: true });
 
 export async function GET(
   request: Request,
@@ -9,14 +9,20 @@ export async function GET(
 ) {
   try {
     const { id } = params;
-    const question = db.prepare('SELECT * FROM questions WHERE id = ?').get(id);
 
-    if (!question) {
+    const row = db.prepare('SELECT * FROM questions WHERE id = ?').get(id);
+
+    if (!row) {
       return NextResponse.json(
         { success: false, error: 'Pregunta no encontrada' },
         { status: 404 }
       );
     }
+
+    const question = {
+      ...row,
+      choices: JSON.parse(row.choices),
+    };
 
     return NextResponse.json({ success: true, data: question });
   } catch (error) {

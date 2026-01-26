@@ -1,31 +1,44 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import Database from 'better-sqlite3';
 import type { NextRequest } from 'next/server';
 
-const METADATA_PATH = path.join(process.cwd(), 'data', 'metadata.json');
-
-async function readMetadata<T>(): Promise<T> {
-  const raw = await fs.readFile(METADATA_PATH, 'utf-8');
-  return JSON.parse(raw) as T;
-}
+const db = new Database('db/quiz.db', { readonly: true });
 
 export async function GET(_request: NextRequest) {
   try {
-    const metadata = await readMetadata<any>();
+    // Leer metadata desde SQLite
+    const rows = db.prepare(`
+      SELECT key, value, type
+      FROM metadata
+    `).all();
+
+    const metadata: any = {};
+
+    // Reconstruir objeto metadata
+    rows.forEach(row => {
+      if (row.type === 'json') {
+        metadata[row.key] = JSON.parse(row.value);
+      } else if (row.type === 'number') {
+        metadata[row.key] = Number(row.value);
+      } else if (row.type === 'boolean') {
+        metadata[row.key] = row.value === 'true';
+      } else {
+        metadata[row.key] = row.value;
+      }
+    });
 
     return NextResponse.json({
       success: true,
       data: metadata,
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching metadata:', error);
     return NextResponse.json(
       {
         success: false,
         error: 'Error al obtener metadata',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error.message,
       },
       { status: 500 }
     );

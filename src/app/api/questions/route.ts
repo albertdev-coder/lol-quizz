@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import Database from 'better-sqlite3';
 import type { NextRequest } from 'next/server';
 
-const db = new Database('db/quiz.db');
+// Reuse DB connection (Next.js keeps module in memory)
+const db = new Database('db/quiz.db', { readonly: true });
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,10 +19,18 @@ export async function GET(request: NextRequest) {
       params.push(level);
     }
 
-    const questions = db.prepare(query).all(...params);
+    const rows = db.prepare(query).all(...params);
 
-    // Mezclar aleatoriamente
+    // Parse JSON fields
+    const questions = rows.map(q => ({
+      ...q,
+      choices: JSON.parse(q.choices),
+    }));
+
+    // Shuffle
     const shuffled = [...questions].sort(() => Math.random() - 0.5);
+
+    // Limit
     const selected = shuffled.slice(0, Math.min(count, shuffled.length));
 
     return NextResponse.json({

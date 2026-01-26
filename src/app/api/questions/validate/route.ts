@@ -1,48 +1,68 @@
 import { NextResponse } from 'next/server';
 import Database from 'better-sqlite3';
-import metadata from '@/data/metadata.json';
 
-const db = new Database('db/quiz.db');
+const db = new Database('db/quiz.db', { readonly: true });
 
 export async function GET() {
   try {
     const questions = db.prepare('SELECT * FROM questions').all();
 
-    // Validar IDs únicos
-    const ids = questions.map(q => q.id);
+    // Parse choices
+    const parsedQuestions = questions.map(q => ({
+      ...q,
+      choices: JSON.parse(q.choices),
+    }));
+
+    // Load metadata from SQLite
+    const metadataRows = db.prepare('SELECT key, value, type FROM metadata').all();
+    const metadata: any = {};
+
+    metadataRows.forEach(row => {
+      if (row.type === 'json') metadata[row.key] = JSON.parse(row.value);
+      else if (row.type === 'number') metadata[row.key] = Number(row.value);
+      else metadata[row.key] = row.value;
+    });
+
+    // Validate unique IDs
+    const ids = parsedQuestions.map(q => q.id);
     const uniqueIds = new Set(ids);
     const hasDuplicates = ids.length !== uniqueIds.size;
     const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
 
-    // Validar cantidad por nivel
+    // Validate level distribution
     const levelCounts: Record<string, number> = { niño: 0, joven: 0, adulto: 0 };
-    questions.forEach(q => {
+    parsedQuestions.forEach(q => {
       if (q.level !== 'mixto') {
         levelCounts[q.level] = (levelCounts[q.level] || 0) + 1;
       }
     });
 
-    // Validar estructura
+    // Validate structure
     const invalidQuestions: Array<{ id: string; issues: string[] }> = [];
-    questions.forEach(q => {
+
+    parsedQuestions.forEach(q => {
       const issues: string[] = [];
+
       if (!q.id) issues.push('Missing id');
       if (!q.level) issues.push('Missing level');
       if (!q.text) issues.push('Missing text');
-      const choices = JSON.parse(q.choices);
-      if (!Array.isArray(choices) || choices.length !== 4) {
+
+      if (!Array.isArray(q.choices) || q.choices.length !== 4) {
         issues.push('Invalid choices array (must have 4 options)');
       }
+
       if (typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex > 3) {
         issues.push('Invalid correctIndex (must be 0-3)');
       }
+
       if (!q.explanation) issues.push('Missing explanation');
+
       if (issues.length > 0) invalidQuestions.push({ id: q.id, issues });
     });
 
-    // Validar metadata
+    // Validate metadata
     const metadataValid =
-      metadata.totalQuestions === questions.length &&
+      metadata.totalQuestions === parsedQuestions.length &&
       metadata.levels.niño === levelCounts.niño &&
       metadata.levels.joven === levelCounts.joven &&
       metadata.levels.adulto === levelCounts.adulto;
@@ -50,14 +70,13 @@ export async function GET() {
     const allValid =
       !hasDuplicates &&
       invalidQuestions.length === 0 &&
-      metadataValid &&
-      questions.length === metadata.totalQuestions;
+      metadataValid;
 
     return NextResponse.json({
       success: true,
       valid: allValid,
       summary: {
-        totalQuestions: questions.length,
+        totalQuestions: parsedQuestions.length,
         expectedQuestions: metadata.totalQuestions,
         uniqueIds: uniqueIds.size,
         hasDuplicates,
@@ -69,12 +88,12 @@ export async function GET() {
       invalidQuestions: invalidQuestions.length > 0 ? invalidQuestions : undefined,
       checks: {
         uniqueIds: !hasDuplicates,
-        correctCount: questions.length === metadata.totalQuestions,
+        correctCount: parsedQuestions.length === metadata.totalQuestions,
         validStructure: invalidQuestions.length === 0,
         metadataMatch: metadataValid,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error validating questions:', error);
     return NextResponse.json(
       { success: false, error: 'Error al validar las preguntas', details: error.message },
