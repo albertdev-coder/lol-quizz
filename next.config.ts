@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -11,7 +12,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Optimizaciones para Chromebook ARM64
   compress: true,
   poweredByHeader: false,
 };
