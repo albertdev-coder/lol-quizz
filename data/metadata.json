@@ -1,10 +1,10 @@
 {
   "category": "Ciencia",
-  "totalQuestions": 30,
+  "totalQuestions": 100,
   "levels": {
-    "niño": 10,
-    "joven": 10,
-    "adulto": 10
+    "niño": 33,
+    "joven": 33,
+    "adulto": 34
   },
   "generatedAt": "2026-01-25",
   "topics": [
