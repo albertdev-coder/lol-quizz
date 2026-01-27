@@ -1,3 +1,5 @@
+'use client';
+
 import { toast } from 'sonner';
 import { AUTH_ENABLED, authConfig } from '../config/auth-config';
 import { AUTH_CODE } from '@/constants/auth';
@@ -133,6 +135,7 @@ async function apiRequest<T = any>(
     if (error instanceof ApiError) {
       if (
         error.status === 401 &&
+        typeof window !== 'undefined' &&
         window.location.pathname !== authConfig.loginPath
       ) {
         // toast.error(error.errorMessage, {

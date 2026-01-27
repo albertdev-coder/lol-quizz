@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Question, QuizLevel, UserAnswer, QuizResult } from '@/types/quiz';
-import { fetchQuestionsFromAPI, calculateScore } from '@/lib/quiz-utils';
+import { fetchQuestionsFromAPI } from '@/lib/quiz-client';
+import { calculateScore } from '@/lib/quiz-utils';
 
 export const useQuiz = (level: QuizLevel) => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -19,6 +20,8 @@ export const useQuiz = (level: QuizLevel) => {
       try {
         const loadedQuestions = await fetchQuestionsFromAPI(level, 10);
         setQuestions(loadedQuestions);
+        // Guardar las preguntas en localStorage para la página de resultados
+        localStorage.setItem('lastQuizQuestions', JSON.stringify(loadedQuestions));
         setStartTime(Date.now());
         setQuestionStartTime(Date.now());
       } catch (error) {
@@ -92,6 +95,8 @@ export const useQuiz = (level: QuizLevel) => {
       try {
         const loadedQuestions = await fetchQuestionsFromAPI(level, 10);
         setQuestions(loadedQuestions);
+        // Guardar las preguntas en localStorage para la página de resultados
+        localStorage.setItem('lastQuizQuestions', JSON.stringify(loadedQuestions));
       } catch (error) {
         console.error('Error loading questions:', error);
       } finally {

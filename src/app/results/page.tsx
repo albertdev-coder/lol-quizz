@@ -5,17 +5,17 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Confetti from '@/components/Confetti';
 import { QuizResult, Question } from '@/types/quiz';
-import { getScoreMessage, getLevelColor, getLevelEmoji, formatTime, saveQuizResults } from '@/lib/quiz-utils';
+import { getScoreMessage, getLevelColor, getLevelEmoji, formatTime } from '@/lib/quiz-utils';
+import { saveQuizResults } from '@/lib/quiz-client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Home, RotateCcw, Share2, Trophy, Clock, Check, X } from 'lucide-react';
-import { getAllQuestions } from '@/lib/quiz-utils';
 
 export default function ResultsPage() {
   const router = useRouter();
   const [results, setResults] = useState<QuizResult | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
@@ -44,8 +44,11 @@ export default function ResultsPage() {
       router.push('/');
     }
 
-    // Cargar todas las preguntas
-    setAllQuestions(getAllQuestions());
+    // Cargar las preguntas que se usaron en el quiz
+    const savedQuestions = localStorage.getItem('lastQuizQuestions');
+    if (savedQuestions) {
+      setQuestions(JSON.parse(savedQuestions));
+    }
   }, [router, isSaved]);
 
   const handleShare = () => {
@@ -77,7 +80,7 @@ export default function ResultsPage() {
 
   // Obtener detalles de cada pregunta
   const getQuestionById = (id: string) => {
-    return allQuestions.find(q => q.id === id);
+    return questions.find(q => q.id === id);
   };
 
   return (
@@ -204,73 +207,75 @@ export default function ResultsPage() {
         </motion.div>
 
         {/* Resumen de respuestas */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: 'var(--color-gray-800)' }}>
-            📝 Resumen de Respuestas
-          </h2>
-          
-          <div className="space-y-4">
-            {results.answers.map((answer, index) => {
-              const question = getQuestionById(answer.questionId);
-              if (!question) return null;
+        {questions.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: 'var(--color-gray-800)' }}>
+              📝 Resumen de Respuestas
+            </h2>
+            
+            <div className="space-y-4">
+              {results.answers.map((answer, index) => {
+                const question = getQuestionById(answer.questionId);
+                if (!question) return null;
 
-              return (
-                <Card
-                  key={`${answer.questionId}-${index}`}
-                  className="p-6 rounded-2xl"
-                  style={{
-                    borderWidth: '3px',
-                    borderColor: answer.isCorrect ? '#86efac' : '#fca5a5',
-                    backgroundColor: answer.isCorrect ? '#f0fdf4' : '#fef2f2'
-                  }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div 
-                      className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: answer.isCorrect ? '#22c55e' : '#ef4444' }}
-                    >
-                      {answer.isCorrect ? (
-                        <Check className="w-6 h-6 text-white" />
-                      ) : (
-                        <X className="w-6 h-6 text-white" />
-                      )}
-                    </div>
-
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--color-gray-800)' }}>
-                        {index + 1}. {question.text}
-                      </h3>
-                      
-                      <div className="space-y-2 mb-3">
-                        <p style={{ color: 'var(--color-gray-700)' }}>
-                          <strong>Tu respuesta:</strong> {question.choices[answer.selectedIndex]}
-                        </p>
-                        {!answer.isCorrect && (
-                          <p style={{ color: '#16a34a' }}>
-                            <strong>Respuesta correcta:</strong> {question.choices[question.correctIndex]}
-                          </p>
+                return (
+                  <Card
+                    key={`${answer.questionId}-${index}`}
+                    className="p-6 rounded-2xl"
+                    style={{
+                      borderWidth: '3px',
+                      borderColor: answer.isCorrect ? '#86efac' : '#fca5a5',
+                      backgroundColor: answer.isCorrect ? '#f0fdf4' : '#fef2f2'
+                    }}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div 
+                        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: answer.isCorrect ? '#22c55e' : '#ef4444' }}
+                      >
+                        {answer.isCorrect ? (
+                          <Check className="w-6 h-6 text-white" />
+                        ) : (
+                          <X className="w-6 h-6 text-white" />
                         )}
                       </div>
 
-                      <div 
-                        className="p-4 bg-white rounded-lg" 
-                        style={{ borderWidth: '2px', borderColor: 'var(--color-blue-light)' }}
-                      >
-                        <p style={{ color: 'var(--color-gray-700)' }}>
-                          <strong style={{ color: 'var(--color-blue-dark)' }}>💡 Explicación:</strong> {question.explanation}
-                        </p>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--color-gray-800)' }}>
+                          {index + 1}. {question.text}
+                        </h3>
+                        
+                        <div className="space-y-2 mb-3">
+                          <p style={{ color: 'var(--color-gray-700)' }}>
+                            <strong>Tu respuesta:</strong> {question.choices[answer.selectedIndex]}
+                          </p>
+                          {!answer.isCorrect && (
+                            <p style={{ color: '#16a34a' }}>
+                              <strong>Respuesta correcta:</strong> {question.choices[question.correctIndex]}
+                            </p>
+                          )}
+                        </div>
+
+                        <div 
+                          className="p-4 bg-white rounded-lg" 
+                          style={{ borderWidth: '2px', borderColor: 'var(--color-blue-light)' }}
+                        >
+                          <p style={{ color: 'var(--color-gray-700)' }}>
+                            <strong style={{ color: 'var(--color-blue-dark)' }}>💡 Explicación:</strong> {question.explanation}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </motion.div>
+                  </Card>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
 
         {/* Botones de acción */}
         <motion.div

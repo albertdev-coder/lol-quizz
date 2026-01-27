@@ -1,78 +1,51 @@
-import { Question, QuizLevel } from '@/types/quiz';
-import questionsData from '@/../data/questions.json';
-
-// Flag para activar/desactivar el uso de API
-// Habilitado por defecto en el navegador
-const USE_API = typeof window !== 'undefined';
+import { QuizLevel } from '@/types/quiz';
 
 /**
- * Obtener preguntas desde la API o fallback a JSON local
+ * PURE UTILITY: Shuffle an array using Fisher-Yates algorithm
+ * This is a pure function safe for both client and server
+ * @param array - Array to shuffle
+ * @returns New shuffled array (does not mutate original)
  */
-export const fetchQuestionsFromAPI = async (level?: QuizLevel, count: number = 10): Promise<Question[]> => {
-  if (!USE_API) {
-    return getQuestionsByLevel(level || 'niño');
-  }
-
-  try {
-    const params = new URLSearchParams();
-    if (level && level !== 'mixto') {
-      params.append('level', level);
-    }
-    params.append('count', count.toString());
-
-    const response = await fetch(`/api/questions?${params.toString()}`);
-    if (!response.ok) {
-      throw new Error('Error al obtener preguntas desde la API');
-    }
-
-    const result = await response.json();
-    if (result.success && result.data) {
-      return result.data as Question[];
-    }
-
-    // Fallback a JSON local si la API retorna datos inválidos
-    console.warn('API response inválida, usando datos locales');
-    return getQuestionsByLevel(level || 'niño');
-  } catch (error) {
-    console.error('Error fetching questions from API, usando datos locales:', error);
-    return getQuestionsByLevel(level || 'niño');
-  }
-};
-
-/**
- * Obtener preguntas directamente del JSON (modo legacy)
- */
-export const getQuestionsByLevel = (level: QuizLevel): Question[] => {
-  if (level === 'mixto') {
-    return shuffleArray([...questionsData] as Question[]);
-  }
-  return (questionsData as Question[]).filter((q) => q.level === level);
-};
-
-export const getAllQuestions = (): Question[] => {
-  return questionsData as Question[];
-};
-
-export const shuffleArray = <T,>(array: T[]): T[] => {
+export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
-};
+}
 
-export const calculateScore = (correctAnswers: number, totalQuestions: number): number => {
+/**
+ * PURE UTILITY: Calculate percentage score
+ * This is a pure function safe for both client and server
+ * @param correctAnswers - Number of correct answers
+ * @param totalQuestions - Total number of questions
+ * @returns Score as percentage (0-100)
+ */
+export function calculateScore(correctAnswers: number, totalQuestions: number): number {
+  if (totalQuestions === 0) return 0;
   return Math.round((correctAnswers / totalQuestions) * 100);
-};
+}
 
-export const formatTime = (seconds: number): string => {
+/**
+ * PURE UTILITY: Format seconds to MM:SS string
+ * This is a pure function safe for both client and server
+ * @param seconds - Time in seconds
+ * @returns Formatted time string (e.g., "5:23")
+ */
+export function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
+}
 
-export const getLevelColor = (level: QuizLevel): string => {
+/**
+ * PURE UTILITY: Get Tailwind CSS gradient class for quiz level
+ * This is a pure function safe for both client and server
+ * @param level - Quiz level
+ * @returns Tailwind CSS gradient class name
+ */
+export function getLevelColor(level: QuizLevel): string {
   switch (level) {
     case 'niño':
       return 'bg-gradient-blue-cyan';
@@ -85,9 +58,15 @@ export const getLevelColor = (level: QuizLevel): string => {
     default:
       return 'bg-[#6b7280]';
   }
-};
+}
 
-export const getLevelEmoji = (level: QuizLevel): string => {
+/**
+ * PURE UTILITY: Get emoji icon for quiz level
+ * This is a pure function safe for both client and server
+ * @param level - Quiz level
+ * @returns Emoji string
+ */
+export function getLevelEmoji(level: QuizLevel): string {
   switch (level) {
     case 'niño':
       return '🌟';
@@ -100,9 +79,19 @@ export const getLevelEmoji = (level: QuizLevel): string => {
     default:
       return '❓';
   }
-};
+}
 
-export const getScoreMessage = (score: number): { title: string; message: string; emoji: string } => {
+/**
+ * PURE UTILITY: Get motivational message based on score
+ * This is a pure function safe for both client and server
+ * @param score - Quiz score (0-100)
+ * @returns Object with title, message, and emoji
+ */
+export function getScoreMessage(score: number): {
+  title: string;
+  message: string;
+  emoji: string;
+} {
   if (score === 100) {
     return {
       title: '¡PERFECTO! 🎉',
@@ -134,34 +123,46 @@ export const getScoreMessage = (score: number): { title: string; message: string
       emoji: '🎓',
     };
   }
-};
+}
 
 /**
- * Guardar resultados del quiz en la API
+ * PURE UTILITY: Get level name in Spanish
+ * This is a pure function safe for both client and server
+ * @param level - Quiz level
+ * @returns Level name in Spanish
  */
-export const saveQuizResults = async (results: any): Promise<boolean> => {
-  if (!USE_API) {
-    // Si no usamos API, solo guardamos en localStorage
-    return true;
+export function getLevelName(level: QuizLevel): string {
+  switch (level) {
+    case 'niño':
+      return 'Nivel Niño';
+    case 'joven':
+      return 'Nivel Joven';
+    case 'adulto':
+      return 'Nivel Adulto';
+    case 'mixto':
+      return 'Modo Mixto';
+    default:
+      return 'Desconocido';
   }
+}
 
-  try {
-    const response = await fetch('/api/results', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(results),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al guardar resultados en la API');
-    }
-
-    const result = await response.json();
-    return result.success;
-  } catch (error) {
-    console.error('Error saving results to API:', error);
-    return false;
+/**
+ * PURE UTILITY: Get level description in Spanish
+ * This is a pure function safe for both client and server
+ * @param level - Quiz level
+ * @returns Level description in Spanish
+ */
+export function getLevelDescription(level: QuizLevel): string {
+  switch (level) {
+    case 'niño':
+      return 'Preguntas básicas y divertidas';
+    case 'joven':
+      return 'Desafíos intermedios';
+    case 'adulto':
+      return 'Preguntas avanzadas';
+    case 'mixto':
+      return 'Todos los niveles mezclados';
+    default:
+      return 'Nivel desconocido';
   }
-};
+}
