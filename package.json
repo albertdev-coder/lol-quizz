@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "dev:debug": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
-    "start": "node .next/standalone/server.js",
+    "start": "next start --port $PORT",
     "lint": "next lint",
     "validate": "node scripts/validate-questions.mjs",
     "postinstall": "node scripts/init-db.mjs"
