@@ -30,6 +30,7 @@ logs
 Thumbs.db
 
 # SQLite database
+db/*.db
 db/*.sqlite
 db/*.sqlite3
 db/*.db-journal
