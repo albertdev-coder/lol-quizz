@@ -3,18 +3,20 @@ import type { NextRequest } from 'next/server';
 import Database from 'better-sqlite3';
 import { QuizResult } from '@/types/quiz';
 
-const db = new Database('db/quiz.db');
+// Conexión a la base de datos (lectura/escritura)
+const db = new Database('db/quiz.db', { fileMustExist: true });
 
-// -------------------------
-// POST → Guardar resultado
-// -------------------------
+/* -------------------------------------------------------
+   POST → Guardar resultado del quiz
+-------------------------------------------------------- */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // Validación básica
     if (!body.level || typeof body.score !== 'number' || !body.answers) {
       return NextResponse.json(
-        { success: false, error: 'Datos inválidos: level, score, answers requeridos' },
+        { success: false, error: 'Datos inválidos: level, score y answers son requeridos' },
         { status: 400 }
       );
     }
@@ -26,19 +28,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Construcción del resultado
     const result: QuizResult = {
       id: `result-${Date.now()}`,
-      totalQuestions: body.totalQuestions || body.answers.length,
-      correctAnswers: body.correctAnswers ?? body.answers.filter((a: any) => a.isCorrect).length,
-      incorrectAnswers: body.incorrectAnswers ?? body.answers.filter((a: any) => !a.isCorrect).length,
-      score: body.score,
-      timeSpent: body.timeSpent || 0,
       level: body.level,
+      score: body.score,
+      totalQuestions: body.totalQuestions || body.answers.length,
+      correctAnswers:
+        body.correctAnswers ??
+        body.answers.filter((a: any) => a.isCorrect).length,
+      incorrectAnswers:
+        body.incorrectAnswers ??
+        body.answers.filter((a: any) => !a.isCorrect).length,
+      timeSpent: body.timeSpent || 0,
       answers: body.answers,
       date: new Date().toISOString(),
     };
 
-    db.prepare(`
+    // Inserción en SQLite
+    db.prepare(
+      `
       INSERT INTO results (
         id, level, score, totalQuestions, correctAnswers,
         incorrectAnswers, timeSpent, date, answers
@@ -47,7 +56,8 @@ export async function POST(request: NextRequest) {
         @id, @level, @score, @totalQuestions, @correctAnswers,
         @incorrectAnswers, @timeSpent, @date, @answers
       )
-    `).run({
+    `
+    ).run({
       ...result,
       answers: JSON.stringify(result.answers),
     });
@@ -65,18 +75,23 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Error saving quiz results:', error);
     return NextResponse.json(
-      { success: false, error: 'Error al guardar el resultado', details: error.message },
+      {
+        success: false,
+        error: 'Error al guardar el resultado',
+        details: error.message,
+      },
       { status: 500 }
     );
   }
 }
 
-// -------------------------
-// GET → Listar resultados
-// -------------------------
+/* -------------------------------------------------------
+   GET → Obtener resultados guardados
+-------------------------------------------------------- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+
     const level = searchParams.get('level');
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const sortBy = searchParams.get('sortBy') || 'date';
@@ -84,15 +99,18 @@ export async function GET(request: NextRequest) {
     let query = 'SELECT * FROM results';
     const params: any[] = [];
 
+    // Filtro por nivel
     if (level && level !== 'mixto') {
       query += ' WHERE level = ?';
       params.push(level);
     }
 
+    // Ordenamiento
     query += sortBy === 'score'
       ? ' ORDER BY score DESC'
       : ' ORDER BY date DESC';
 
+    // Límite
     query += ' LIMIT ?';
     params.push(limit);
 
@@ -113,7 +131,11 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Error fetching quiz results:', error);
     return NextResponse.json(
-      { success: false, error: 'Error al obtener los resultados', details: error.message },
+      {
+        success: false,
+        error: 'Error al obtener los resultados',
+        details: error.message,
+      },
       { status: 500 }
     );
   }

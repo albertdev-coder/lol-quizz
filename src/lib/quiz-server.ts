@@ -3,8 +3,12 @@ import Database from 'better-sqlite3';
 import { Question, QuizLevel } from '@/types/quiz';
 import { shuffleArray } from './quiz-utils';
 
-const db = new Database('db/quiz.db', { readonly: true });
+// Base de datos en modo lectura/escritura
+const db = new Database('db/quiz.db', { fileMustExist: true });
 
+/**
+ * Convierte una fila de la base de datos en un objeto Question tipado.
+ */
 function mapRowToQuestion(row: any): Question {
   return {
     id: row.id,
@@ -17,11 +21,17 @@ function mapRowToQuestion(row: any): Question {
   };
 }
 
+/**
+ * Obtiene todas las preguntas sin filtros.
+ */
 export function getAllQuestions(): Question[] {
   const rows = db.prepare('SELECT * FROM questions').all();
   return rows.map(mapRowToQuestion);
 }
 
+/**
+ * Obtiene preguntas filtradas por nivel.
+ */
 export function getQuestionsByLevel(level: QuizLevel): Question[] {
   if (level === 'mixto') {
     const rows = db.prepare('SELECT * FROM questions').all();
@@ -32,7 +42,13 @@ export function getQuestionsByLevel(level: QuizLevel): Question[] {
   return rows.map(mapRowToQuestion);
 }
 
-export function getRandomQuestions(level?: QuizLevel, count?: number): Question[] {
+/**
+ * Obtiene preguntas aleatorias, con opción de nivel y cantidad.
+ */
+export function getRandomQuestions(
+  level?: QuizLevel,
+  count?: number
+): Question[] {
   let rows: any[];
 
   if (!level || level === 'mixto') {
@@ -41,7 +57,6 @@ export function getRandomQuestions(level?: QuizLevel, count?: number): Question[
     rows = db.prepare('SELECT * FROM questions WHERE level = ?').all(level);
   }
 
-  // 👇 Aquí está el fix real: tipamos shuffleArray
   const questions: Question[] = shuffleArray<Question>(
     rows.map(mapRowToQuestion)
   );
