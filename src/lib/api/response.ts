@@ -5,7 +5,6 @@ import { ZodError } from 'zod';
  * Standardized API Response Builder
  * Ensures all API responses follow the same format
  */
-
 export interface ApiSuccessResponse<T = any> {
   success: true;
   data?: T;
@@ -36,11 +35,11 @@ export function createSuccessResponse<T = any>(
     timestamp: new Date().toISOString(),
     ...extras
   };
-  
+
   if (data !== undefined) {
     response.data = data;
   }
-  
+
   return NextResponse.json(response, { status: 200 });
 }
 
@@ -61,7 +60,7 @@ export function createErrorResponse(
     timestamp: new Date().toISOString(),
     ...extras
   };
-  
+
   return NextResponse.json(response, { status: statusCode });
 }
 
@@ -69,14 +68,12 @@ export function createErrorResponse(
  * Error codes enum
  */
 export const ErrorCodes = {
-  // Client errors (400-499)
   BAD_REQUEST: 'BAD_REQUEST',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   INVALID_INPUT: 'INVALID_INPUT',
-  
-  // Server errors (500-599)
+
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   DATABASE_ERROR: 'DATABASE_ERROR',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR'
@@ -89,7 +86,7 @@ export function handleZodError(error: ZodError): NextResponse<ApiErrorResponse> 
   const firstError = error.errors[0];
   const field = firstError.path.join('.');
   const message = firstError.message;
-  
+
   return createErrorResponse(
     `Validation error: ${field ? `${field} - ` : ''}${message}`,
     400,
@@ -108,14 +105,12 @@ export function handleZodError(error: ZodError): NextResponse<ApiErrorResponse> 
  */
 export function handleDatabaseError(error: any): NextResponse<ApiErrorResponse> {
   console.error('Database error:', error);
-  
-  // Don't expose internal database errors to client
+
   return createErrorResponse(
     'Database operation failed',
     500,
     {
       errorCode: ErrorCodes.DATABASE_ERROR,
-      // Only include error message in development
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     }
   );
@@ -126,18 +121,15 @@ export function handleDatabaseError(error: any): NextResponse<ApiErrorResponse> 
  */
 export function handleGenericError(error: any): NextResponse<ApiErrorResponse> {
   console.error('Unhandled error:', error);
-  
-  // Check if it's a known error type
+
   if (error instanceof ZodError) {
     return handleZodError(error);
   }
-  
-  // Check for database errors (better-sqlite3)
+
   if (error?.code?.startsWith('SQLITE_')) {
     return handleDatabaseError(error);
   }
-  
-  // Generic error
+
   return createErrorResponse(
     'An unexpected error occurred',
     500,
@@ -149,61 +141,11 @@ export function handleGenericError(error: any): NextResponse<ApiErrorResponse> {
 }
 
 /**
- * Create rate limit error response
- */
-export function createRateLimitError(
-  resetTime: number
-): NextResponse<ApiErrorResponse> {
-  return createErrorResponse(
-    'Too many requests. Please try again later.',
-    429,
-    {
-      errorCode: ErrorCodes.RATE_LIMIT_EXCEEDED,
-      details: {
-        resetAt: new Date(resetTime).toISOString()
-      }
-    }
-  );
-}
-
-/**
- * Create not found error response
- */
-export function createNotFoundError(
-  resource: string
-): NextResponse<ApiErrorResponse> {
-  return createErrorResponse(
-    `${resource} not found`,
-    404,
-    {
-      errorCode: ErrorCodes.NOT_FOUND
-    }
-  );
-}
-
-/**
- * Create validation error response
- */
-export function createValidationError(
-  message: string,
-  details?: any
-): NextResponse<ApiErrorResponse> {
-  return createErrorResponse(
-    message,
-    400,
-    {
-      errorCode: ErrorCodes.VALIDATION_ERROR,
-      details
-    }
-  );
-}
-
-/**
  * Wrap API handler with error handling
  */
 export function withErrorHandler<T = any>(
-  handler: () => Promise<NextResponse<T>>
-): Promise<NextResponse<T | ApiErrorResponse>> {
+  handler: () => Promise<NextResponse<ApiSuccessResponse<T> | ApiErrorResponse>>
+): Promise<NextResponse<ApiSuccessResponse<T> | ApiErrorResponse>> {
   return handler().catch((error) => {
     return handleGenericError(error);
   });
