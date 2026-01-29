@@ -43,7 +43,11 @@ function sanitizeUrl(url: string): string {
 
 // Proxy principal
 export function proxy(req: NextRequest) {
-  const ip = req.ip ?? "unknown";
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown";
+
   const url = sanitizeUrl(req.nextUrl.pathname);
 
   // Logging simple

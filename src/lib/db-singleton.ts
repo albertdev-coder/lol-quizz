@@ -6,12 +6,13 @@ import path from 'path';
  * Ensures only one database connection is created and reused
  */
 
-let db: Database.Database | null = null;
+// better-sqlite3 NO exporta tipos → usamos `any`
+let db: any = null;
 
-export function getDB(): Database.Database {
+export function getDB() {
   if (!db) {
     const dbPath = path.join(process.cwd(), 'db', 'quiz.db');
-    
+
     db = new Database(dbPath, {
       readonly: false,
       fileMustExist: false,
@@ -19,18 +20,17 @@ export function getDB(): Database.Database {
     });
 
     // Optimize SQLite for better performance
-    db.pragma('journal_mode = WAL'); // Write-Ahead Logging
+    db.pragma('journal_mode = WAL');
     db.pragma('synchronous = NORMAL');
     db.pragma('cache_size = 10000');
     db.pragma('temp_store = MEMORY');
     db.pragma('foreign_keys = ON');
-    
-    // Log connection in development
+
     if (process.env.NODE_ENV === 'development') {
       console.log(`[DB] Connected to SQLite database at ${dbPath}`);
     }
   }
-  
+
   return db;
 }
 
@@ -41,7 +41,7 @@ export function closeDB(): void {
   if (db) {
     db.close();
     db = null;
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log('[DB] Database connection closed');
     }

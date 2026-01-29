@@ -141,6 +141,56 @@ export function handleGenericError(error: any): NextResponse<ApiErrorResponse> {
 }
 
 /**
+ * Create not found error response
+ */
+export function createNotFoundError(
+  resource: string
+): NextResponse<ApiErrorResponse> {
+  return createErrorResponse(
+    `${resource} not found`,
+    404,
+    {
+      errorCode: ErrorCodes.NOT_FOUND
+    }
+  );
+}
+
+/**
+ * Create validation error response
+ */
+export function createValidationError(
+  message: string,
+  details?: any
+): NextResponse<ApiErrorResponse> {
+  return createErrorResponse(
+    message,
+    400,
+    {
+      errorCode: ErrorCodes.VALIDATION_ERROR,
+      details
+    }
+  );
+}
+
+/**
+ * Create rate limit error response
+ */
+export function createRateLimitError(
+  resetTime: number
+): NextResponse<ApiErrorResponse> {
+  return createErrorResponse(
+    'Too many requests. Please try again later.',
+    429,
+    {
+      errorCode: ErrorCodes.RATE_LIMIT_EXCEEDED,
+      details: {
+        resetAt: new Date(resetTime).toISOString()
+      }
+    }
+  );
+}
+
+/**
  * Wrap API handler with error handling
  */
 export function withErrorHandler<T = any>(
