@@ -1,38 +1,81 @@
-import { NextResponse } from 'next/server';
-import Database from 'better-sqlite3';
+import { NextRequest } from 'next/server';
+import {
+  createSuccessResponse,
+  createNotFoundError,
+  handleDatabaseError,
+  handleZodError,
+  withErrorHandler
+} from '@/lib/api/response';
+import { logger } from '@/lib/api/logger';
+import { ResultIdSchema } from '@/lib/validation/schemas';
+import { sanitizeResultId } from '@/lib/security/sanitize';
+import { getDB } from '@/lib/db-singleton';
 
-const db = new Database('db/quiz.db', { readonly: true });
-
+/**
+ * Get Result by ID
+ * GET /api/results/[id]
+ */
 export async function GET(
-  request: Request,
+  request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return withErrorHandler(async () => {
+    const startTime = Date.now();
     const { id } = await context.params;
-
-    const row = db.prepare('SELECT * FROM results WHERE id = ?').get(id);
-
-    if (!row) {
-      return NextResponse.json(
-        { success: false, error: 'Resultado no encontrado' },
-        { status: 404 }
-      );
+    
+    logger.apiRequest('GET', `/api/results/${id}`);
+    
+    // Sanitize ID
+    const sanitizedId = sanitizeResultId(id);
+    
+    if (!sanitizedId) {
+      logger.validationError(`/api/results/${id}`, { message: 'Invalid result ID format' });
+      return createNotFoundError('Result');
+    }
+    
+    // Validate with Zod
+    const validationResult = ResultIdSchema.safeParse(sanitizedId);
+    
+    if (!validationResult.success) {
+      logger.validationError(`/api/results/${id}`, validationResult.error);
+      return handleZodError(validationResult.error);
     }
 
-    const parsed = {
-      ...row,
-      answers: JSON.parse(row.answers),
-    };
+    try {
+      const db = getDB();
+      
+      const row = db.prepare('SELECT * FROM results WHERE id = ?').get(sanitizedId);
 
-    return NextResponse.json({
-      success: true,
-      data: parsed,
-    });
-  } catch (error) {
-    console.error('Error fetching result:', error);
-    return NextResponse.json(
-      { success: false, error: 'Error al obtener el resultado' },
-      { status: 500 }
-    );
-  }
+      if (!row) {
+        const duration = Date.now() - startTime;
+        logger.apiResponse('GET', `/api/results/${id}`, 404, duration);
+        return createNotFoundError('Result');
+      }
+
+      // Parse answers field safely
+      let result: any;
+      try {
+        result = {
+          ...row,
+          answers: typeof (row as any).answers === 'string' 
+            ? JSON.parse((row as any).answers) 
+            : (row as any).answers
+        };
+      } catch (parseError) {
+        logger.warn(`Failed to parse answers for result ${id}`, { error: parseError });
+        result = {
+          ...row,
+          answers: []
+        };
+      }
+
+      const duration = Date.now() - startTime;
+      logger.apiResponse('GET', `/api/results/${id}`, 200, duration);
+
+      return createSuccessResponse(result);
+    } catch (error: any) {
+      logger.databaseError(`Get result ${id}`, error);
+      return handleDatabaseError(error);
+    }
+  });
 }

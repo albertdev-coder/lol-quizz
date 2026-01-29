@@ -1,142 +1,173 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import Database from 'better-sqlite3';
-import { QuizResult } from '@/types/quiz';
+import { NextRequest } from 'next/server';
+import {
+  createSuccessResponse,
+  createValidationError,
+  handleDatabaseError,
+  handleZodError,
+  withErrorHandler
+} from '@/lib/api/response';
+import { logger } from '@/lib/api/logger';
+import { SaveResultBodySchema, GetResultsQuerySchema } from '@/lib/validation/schemas';
+import { sanitizeObject } from '@/lib/security/sanitize';
+import { getDB } from '@/lib/db-singleton';
 
-// Conexión a la base de datos (lectura/escritura)
-const db = new Database('db/quiz.db', { fileMustExist: true });
-
-/* -------------------------------------------------------
-   POST → Guardar resultado del quiz
--------------------------------------------------------- */
+/**
+ * Save Quiz Result
+ * POST /api/results
+ */
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-
-    // Validación básica
-    if (!body.level || typeof body.score !== 'number' || !body.answers) {
-      return NextResponse.json(
-        { success: false, error: 'Datos inválidos: level, score y answers son requeridos' },
-        { status: 400 }
-      );
+  return withErrorHandler(async () => {
+    const startTime = Date.now();
+    
+    logger.apiRequest('POST', '/api/results');
+    
+    let body: any;
+    
+    try {
+      body = await request.json();
+    } catch (error) {
+      logger.validationError('/api/results POST', { message: 'Invalid JSON body' });
+      return createValidationError('Invalid JSON body');
     }
-
-    if (!Array.isArray(body.answers) || body.answers.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'El campo answers debe ser un array no vacío' },
-        { status: 422 }
-      );
+    
+    // Sanitize input
+    const sanitizedBody = sanitizeObject(body);
+    
+    // Validate with Zod
+    const validationResult = SaveResultBodySchema.safeParse(sanitizedBody);
+    
+    if (!validationResult.success) {
+      logger.validationError('/api/results POST', validationResult.error);
+      return handleZodError(validationResult.error);
     }
-
-    // Construcción del resultado
-    const result: QuizResult = {
-      id: `result-${Date.now()}`,
-      level: body.level,
-      score: body.score,
-      totalQuestions: body.totalQuestions || body.answers.length,
-      correctAnswers:
-        body.correctAnswers ??
-        body.answers.filter((a: any) => a.isCorrect).length,
-      incorrectAnswers:
-        body.incorrectAnswers ??
-        body.answers.filter((a: any) => !a.isCorrect).length,
-      timeSpent: body.timeSpent || 0,
-      answers: body.answers,
-      date: new Date().toISOString(),
-    };
-
-    // Inserción en SQLite
-    db.prepare(
-      `
-      INSERT INTO results (
-        id, level, score, totalQuestions, correctAnswers,
-        incorrectAnswers, timeSpent, date, answers
-      )
-      VALUES (
-        @id, @level, @score, @totalQuestions, @correctAnswers,
-        @incorrectAnswers, @timeSpent, @date, @answers
-      )
-    `
-    ).run({
-      ...result,
-      answers: JSON.stringify(result.answers),
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Resultado guardado correctamente',
-      data: {
-        id: result.id,
-        timestamp: result.date,
-        score: result.score,
-        level: result.level,
-      },
-    });
-  } catch (error: any) {
-    console.error('Error saving quiz results:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Error al guardar el resultado',
-        details: error.message,
-      },
-      { status: 500 }
-    );
-  }
+    
+    const validatedData = validationResult.data;
+    
+    try {
+      const db = getDB();
+      
+      const result = {
+        id: `result-${Date.now()}`,
+        level: validatedData.level,
+        score: validatedData.score,
+        totalQuestions: validatedData.totalQuestions,
+        correctAnswers: validatedData.correctAnswers,
+        incorrectAnswers: validatedData.incorrectAnswers,
+        timeSpent: validatedData.timeSpent,
+        date: new Date().toISOString(),
+        answers: JSON.stringify(validatedData.answers)
+      };
+      
+      db.prepare(`
+        INSERT INTO results (
+          id, level, score, totalQuestions, correctAnswers,
+          incorrectAnswers, timeSpent, date, answers
+        )
+        VALUES (
+          @id, @level, @score, @totalQuestions, @correctAnswers,
+          @incorrectAnswers, @timeSpent, @date, @answers
+        )
+      `).run(result);
+      
+      const duration = Date.now() - startTime;
+      logger.apiResponse('POST', '/api/results', 200, duration);
+      
+      return createSuccessResponse(
+        {
+          id: result.id,
+          timestamp: result.date,
+          score: result.score,
+          level: result.level
+        },
+        { message: 'Result saved successfully' }
+      );
+    } catch (error: any) {
+      logger.databaseError('Save result', error);
+      return handleDatabaseError(error);
+    }
+  });
 }
 
-/* -------------------------------------------------------
-   GET → Obtener resultados guardados
--------------------------------------------------------- */
+/**
+ * Get Quiz Results
+ * GET /api/results?level={level}&limit={limit}&sortBy={sortBy}
+ */
 export async function GET(request: NextRequest) {
-  try {
+  return withErrorHandler(async () => {
+    const startTime = Date.now();
     const { searchParams } = new URL(request.url);
-
-    const level = searchParams.get('level');
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
-    const sortBy = searchParams.get('sortBy') || 'date';
-
-    let query = 'SELECT * FROM results';
-    const params: any[] = [];
-
-    // Filtro por nivel
-    if (level && level !== 'mixto') {
-      query += ' WHERE level = ?';
-      params.push(level);
-    }
-
-    // Ordenamiento
-    query += sortBy === 'score'
-      ? ' ORDER BY score DESC'
-      : ' ORDER BY date DESC';
-
-    // Límite
-    query += ' LIMIT ?';
-    params.push(limit);
-
-    const rows = db.prepare(query).all(...params);
-
-    const results = rows.map((r: any) => ({
-      ...r,
-      answers: JSON.parse(r.answers),
-    }));
-
-    return NextResponse.json({
-      success: true,
-      data: results,
-      total: results.length,
-      showing: results.length,
-      filters: { level: level || 'all', limit, sortBy },
+    
+    logger.apiRequest('GET', '/api/results', {
+      level: searchParams.get('level'),
+      limit: searchParams.get('limit'),
+      sortBy: searchParams.get('sortBy')
     });
-  } catch (error: any) {
-    console.error('Error fetching quiz results:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Error al obtener los resultados',
-        details: error.message,
-      },
-      { status: 500 }
-    );
-  }
+    
+    // Validate query parameters
+    const validationResult = GetResultsQuerySchema.safeParse({
+      level: searchParams.get('level'),
+      limit: searchParams.get('limit'),
+      sortBy: searchParams.get('sortBy')
+    });
+    
+    if (!validationResult.success) {
+      logger.validationError('/api/results GET', validationResult.error);
+      return handleZodError(validationResult.error);
+    }
+    
+    const { level, limit, sortBy } = validationResult.data;
+    
+    try {
+      const db = getDB();
+      
+      let query = 'SELECT * FROM results';
+      const params: any[] = [];
+
+      if (level && level !== 'mixto') {
+        query += ' WHERE level = ?';
+        params.push(level);
+      }
+
+      query += sortBy === 'score' 
+        ? ' ORDER BY score DESC' 
+        : ' ORDER BY date DESC';
+
+      query += ' LIMIT ?';
+      params.push(limit);
+
+      const rows = db.prepare(query).all(...params) as any[];
+
+      // Parse answers field safely
+      const results = rows.map((r) => {
+        try {
+          return {
+            ...r,
+            answers: typeof r.answers === 'string' ? JSON.parse(r.answers) : r.answers
+          };
+        } catch (parseError) {
+          logger.warn(`Failed to parse answers for result ${r.id}`, { error: parseError });
+          return {
+            ...r,
+            answers: []
+          };
+        }
+      });
+
+      const duration = Date.now() - startTime;
+      logger.apiResponse('GET', '/api/results', 200, duration);
+
+      return createSuccessResponse(results, {
+        total: results.length,
+        showing: results.length,
+        filters: { 
+          level: level || 'all', 
+          limit, 
+          sortBy 
+        }
+      });
+    } catch (error: any) {
+      logger.databaseError('Get results', error);
+      return handleDatabaseError(error);
+    }
+  });
 }
