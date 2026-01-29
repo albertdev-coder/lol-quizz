@@ -10,7 +10,7 @@
     "lint": "next lint",
     "validate": "node scripts/validate-questions.mjs",
     "postinstall": "node scripts/init-db.mjs"
-      },
+  },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.9.1",
@@ -42,7 +42,8 @@
     "react-dom": "^19",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
