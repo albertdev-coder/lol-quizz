@@ -1,83 +1,54 @@
 import 'server-only';
-import Database from 'better-sqlite3';
-import path from 'path';
 
-const dbPath = path.join(process.cwd(), 'db', 'quiz.db');
-const db = new Database(dbPath);
+import { and, desc, eq, sql } from 'drizzle-orm';
+import { db } from '@/lib/db/client';
+import { questions, results } from '@/lib/db/schema';
 
-/**
- * SERVER-ONLY: Get questions from database with optional filtering
- * This function can only be used in server components and API routes
- * @param level - Optional level filter (omit or use 'mixto' for all levels)
- * @param count - Optional limit on number of questions
- * @returns Array of question records from database
- */
-export function getQuestions(level?: string, count?: number) {
-  let query = 'SELECT * FROM questions';
-  const params: any[] = [];
+export async function getQuestions(level?: string, count?: number, categoryId = 'ciencia') {
+  const whereClause = [eq(questions.categoryId, categoryId)];
 
   if (level && level !== 'mixto') {
-    query += ' WHERE level = ?';
-    params.push(level);
+    whereClause.push(eq(questions.level, level as 'niño' | 'joven' | 'adulto'));
   }
 
-  query += ' ORDER BY RANDOM()';
-  if (count) {
-    query += ' LIMIT ?';
-    params.push(count);
-  }
+  const rows = await db
+    .select()
+    .from(questions)
+    .where(and(...whereClause))
+    .orderBy(sql`RANDOM()`)
+    .limit(count ?? 10);
 
-  return db.prepare(query).all(...params);
+  return rows;
 }
 
-/**
- * SERVER-ONLY: Get a single question by ID from database
- * This function can only be used in server components and API routes
- * @param id - Question ID
- * @returns Question record or undefined if not found
- */
-export function getQuestionById(id: string) {
-  return db.prepare('SELECT * FROM questions WHERE id = ?').get(id);
+export async function getQuestionById(id: string) {
+  const row = await db.select().from(questions).where(eq(questions.id, id)).limit(1);
+  return row[0];
 }
 
-/**
- * SERVER-ONLY: Save a quiz result to database
- * This function can only be used in server components and API routes
- * @param result - Quiz result object to save
- */
-export function saveResult(result: any) {
-  db.prepare(
-    `INSERT INTO results 
-     (id, level, score, totalQuestions, correctAnswers, incorrectAnswers, timeSpent, date, answers) 
-     VALUES (@id, @level, @score, @totalQuestions, @correctAnswers, @incorrectAnswers, @timeSpent, @date, @answers)`
-  ).run(result);
+export async function saveResult(result: {
+  id: string;
+  level: 'niño' | 'joven' | 'adulto' | 'mixto';
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  timeSpent: number;
+  date: string;
+  answers: unknown[];
+}) {
+  await db.insert(results).values({
+    ...result,
+    date: new Date(result.date),
+  });
 }
 
-/**
- * SERVER-ONLY: Get quiz results from database with optional filtering
- * This function can only be used in server components and API routes
- * @param level - Optional level filter (omit or use 'mixto' for all levels)
- * @param limit - Maximum number of results to return (default: 10)
- * @param sortBy - Sort field: 'date' or 'score' (default: 'date')
- * @returns Array of result records from database
- */
-export function getResults(level?: string, limit = 10, sortBy = 'date') {
-  let query = 'SELECT * FROM results';
-  const params: any[] = [];
+export async function getResults(level?: string, limit = 10, sortBy: 'date' | 'score' = 'date') {
+  const query = db.select().from(results);
 
-  if (level && level !== 'mixto') {
-    query += ' WHERE level = ?';
-    params.push(level);
-  }
+  const whereQuery = level && level !== 'mixto' ? query.where(eq(results.level, level as any)) : query;
 
-  if (sortBy === 'score') {
-    query += ' ORDER BY score DESC';
-  } else {
-    query += ' ORDER BY date DESC';
-  }
-
-  query += ' LIMIT ?';
-  params.push(limit);
-
-  return db.prepare(query).all(...params);
+  return whereQuery
+    .orderBy(sortBy === 'score' ? desc(results.score) : desc(results.date))
+    .limit(limit);
 }

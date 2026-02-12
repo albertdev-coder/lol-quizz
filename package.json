@@ -7,7 +7,10 @@
     "dev:debug": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start --port $PORT",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx src/lib/db/seed.ts"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
@@ -29,7 +32,6 @@
     "@radix-ui/react-toast": "1.2.4",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.1",

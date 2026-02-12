@@ -23,8 +23,11 @@ export const ResultIdSchema = z.string().regex(/^result-\d+$/, {
 // QUERY PARAMETERS SCHEMAS
 // ============================================
 
+export const CategorySlugSchema = z.enum(['ciencia', 'otaku', 'teologia']).default('ciencia');
+
 export const GetQuestionsQuerySchema = z.object({
   level: QuizLevelSchema.optional(),
+  category: CategorySlugSchema.optional(),
   count: z.coerce
     .number()
     .int()
