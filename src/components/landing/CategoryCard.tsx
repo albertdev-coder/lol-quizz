@@ -12,10 +12,12 @@ export function CategoryCard({ category }: CategoryCardProps) {
     <article>
       <Link
         href={`/quiz?category=${category.id}`}
-        className="group flex h-full flex-col rounded-3xl border border-white/60 bg-white/80 p-6 shadow-sm backdrop-blur transition hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+        className="group flex h-full flex-col rounded-3xl border border-white/70 bg-white/85 p-6 shadow-sm backdrop-blur transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
         aria-label={`Entrar a la categoría ${category.title}`}
       >
-        <div className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${category.accentClass} text-white shadow-md`}>
+        <div
+          className={`mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${category.accentClass} text-white shadow-md transition-transform duration-200 group-hover:scale-105`}
+        >
           <CategoryIcon iconId={category.iconId} className="h-7 w-7" />
         </div>
 

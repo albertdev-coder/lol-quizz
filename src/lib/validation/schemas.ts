@@ -1,16 +1,7 @@
 import { z } from 'zod';
+import { APP_LEVELS } from '@/constants/quiz-levels';
 
-export const QuizLevelSchema = z.enum([
-  'principiante',
-  'intermedio',
-  'avanzado',
-  'aprendiz',
-  'creyente',
-  'sabio',
-  'fan',
-  'entusiasta',
-  'otaku_mater',
-]);
+export const QuizLevelSchema = z.enum(APP_LEVELS);
 
 export const QuestionIdSchema = z.string().regex(/^q-\d{3}$/, {
   message: 'Formato inválido de ID de pregunta. Debe ser q-001 a q-999',

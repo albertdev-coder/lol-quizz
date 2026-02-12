@@ -108,7 +108,7 @@ export function getLevelName(level: QuizLevel): string {
     sabio: 'Sabio',
     fan: 'Fan',
     entusiasta: 'Entusiasta',
-    otaku_mater: 'Otaku Mater',
+    otaku_mater: 'Otaku Mater.',
   };
 
   return labels[level] ?? 'Nivel';

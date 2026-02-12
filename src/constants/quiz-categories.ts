@@ -49,7 +49,7 @@ export const CATEGORY_CONFIG: Record<QuizCategory, CategoryConfig> = {
     levels: [
       { level: 'fan', title: 'Fan', description: 'Ideal para quienes están empezando en el anime.' },
       { level: 'entusiasta', title: 'Entusiasta', description: 'Más detalles, más memoria, más emoción.' },
-      { level: 'otaku_mater', title: 'Otaku Mater', description: 'Solo para verdaderos expertos del género.' },
+      { level: 'otaku_mater', title: 'Otaku Mater.', description: 'Solo para verdaderos expertos del género.' },
     ],
   },
 };

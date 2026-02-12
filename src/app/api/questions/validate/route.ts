@@ -4,6 +4,7 @@ import { createSuccessResponse, handleDatabaseError, withErrorHandler } from '@/
 import { logger } from '@/lib/api/logger';
 import { db } from '@/lib/db/client';
 import { categories, metadata, questions } from '@/lib/db/schema';
+import { toAppLevel } from '@/constants/quiz-levels';
 
 export async function GET(_request: NextRequest) {
   return withErrorHandler(async () => {
@@ -23,7 +24,7 @@ export async function GET(_request: NextRequest) {
           .groupBy(questions.level);
 
         distribution[category.slug] = levelRows.reduce<Record<string, number>>((acc, row) => {
-          acc[row.level] = row.count;
+          acc[toAppLevel(row.level)] = row.count;
           return acc;
         }, {});
       }

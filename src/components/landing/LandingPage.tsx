@@ -8,8 +8,8 @@ export function LandingPage() {
   return (
     <main className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-4 py-16 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/4 top-10 h-48 w-48 rounded-full bg-violet-300/25 blur-3xl" />
-        <div className="absolute bottom-10 right-1/4 h-56 w-56 rounded-full bg-cyan-200/30 blur-3xl" />
+        <div className="absolute left-1/4 top-10 h-48 w-48 rounded-full bg-violet-300/20 blur-3xl" />
+        <div className="absolute bottom-10 right-1/4 h-56 w-56 rounded-full bg-cyan-200/25 blur-3xl" />
       </div>
 
       <header className="mx-auto max-w-3xl text-center">
@@ -18,14 +18,14 @@ export function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-violet-700"
         >
-          Tu próximo reto comienza aquí
+          Desafía tu mente
         </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-4xl font-bold text-slate-900 sm:text-5xl"
         >
-          Elige una categoría y demuestra lo que sabes.
+          Tres categorías, un solo objetivo: superarte.
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
@@ -33,7 +33,7 @@ export function LandingPage() {
           transition={{ delay: 0.1 }}
           className="mt-4 text-base text-slate-600 sm:text-lg"
         >
-          Ciencia, Teología y Anime en una experiencia rápida, clara y adictiva.
+          Elige Ciencia, Teología o Anime y empieza un reto rápido con niveles progresivos.
         </motion.p>
       </header>
 

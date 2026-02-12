@@ -8,10 +8,11 @@ import { getLevelColor, getLevelEmoji } from '@/lib/quiz-utils';
 
 interface LevelSelectorProps {
   category: QuizCategory;
+  selectedLevel?: QuizLevel | null;
   onSelectLevel: (level: QuizLevel) => void;
 }
 
-export function LevelSelector({ category, onSelectLevel }: LevelSelectorProps) {
+export function LevelSelector({ category, selectedLevel, onSelectLevel }: LevelSelectorProps) {
   const categoryConfig = CATEGORY_CONFIG[category];
 
   return (
@@ -27,26 +28,38 @@ export function LevelSelector({ category, onSelectLevel }: LevelSelectorProps) {
       </motion.header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {categoryConfig.levels.map((levelData, index) => (
-          <motion.button
-            key={levelData.level}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.08 }}
-            whileHover={{ y: -4 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onSelectLevel(levelData.level)}
-            className="text-left"
-          >
-            <Card className="h-full rounded-3xl border border-violet-100 bg-white p-6 shadow-sm transition hover:shadow-lg">
-              <div className={`mb-4 inline-flex rounded-2xl px-4 py-2 text-lg font-semibold text-white ${getLevelColor(levelData.level)}`}>
-                {getLevelEmoji(levelData.level)}
-              </div>
-              <h3 className="text-2xl font-semibold text-slate-900">{levelData.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{levelData.description}</p>
-            </Card>
-          </motion.button>
-        ))}
+        {categoryConfig.levels.map((levelData, index) => {
+          const isSelected = selectedLevel === levelData.level;
+
+          return (
+            <motion.button
+              key={levelData.level}
+              type="button"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.08 }}
+              whileHover={{ y: -4 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={() => onSelectLevel(levelData.level)}
+              aria-pressed={isSelected}
+              className="text-left"
+            >
+              <Card
+                className={`h-full rounded-3xl border bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-lg ${
+                  isSelected ? 'border-violet-500 ring-2 ring-violet-200' : 'border-violet-100'
+                }`}
+              >
+                <div
+                  className={`mb-4 inline-flex rounded-2xl px-4 py-2 text-lg font-semibold text-white ${getLevelColor(levelData.level)}`}
+                >
+                  {getLevelEmoji(levelData.level)}
+                </div>
+                <h3 className="text-2xl font-semibold text-slate-900">{levelData.title}</h3>
+                <p className="mt-2 text-sm text-slate-600">{levelData.description}</p>
+              </Card>
+            </motion.button>
+          );
+        })}
       </div>
     </section>
   );

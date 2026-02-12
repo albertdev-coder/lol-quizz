@@ -8,29 +8,10 @@ import {
   uniqueIndex,
   index,
 } from 'drizzle-orm/pg-core';
+import { DB_LEVELS } from '@/constants/quiz-levels';
 
-export const questionLevelEnum = pgEnum('question_level', [
-  'principiante',
-  'intermedio',
-  'avanzado',
-  'aprendiz',
-  'creyente',
-  'sabio',
-  'fan',
-  'entusiasta',
-  'otaku_mater',
-]);
-export const resultLevelEnum = pgEnum('result_level', [
-  'principiante',
-  'intermedio',
-  'avanzado',
-  'aprendiz',
-  'creyente',
-  'sabio',
-  'fan',
-  'entusiasta',
-  'otaku_mater',
-]);
+export const questionLevelEnum = pgEnum('question_level', DB_LEVELS);
+export const resultLevelEnum = pgEnum('result_level', DB_LEVELS);
 
 export const categories = pgTable(
   'categories',

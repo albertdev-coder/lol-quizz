@@ -58,7 +58,7 @@ export default function QuizPageClient() {
             Volver al inicio
           </Button>
         </motion.div>
-        <LevelSelector category={category} onSelectLevel={setSelectedLevel} />
+        <LevelSelector category={category} selectedLevel={selectedLevel} onSelectLevel={setSelectedLevel} />
       </div>
     );
   }

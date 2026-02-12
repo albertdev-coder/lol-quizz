@@ -1,7 +1,8 @@
 import { eq, inArray, sql } from 'drizzle-orm';
 import { closeDbConnection, db } from '@/lib/db/client';
 import { categories, metadata, questions } from '@/lib/db/schema';
-import { CATEGORY_CONFIG, CATEGORY_LIST } from '@/constants/quiz-categories';
+import { CATEGORY_LIST } from '@/constants/quiz-categories';
+import { toDbLevel } from '@/constants/quiz-levels';
 
 type SeedLevel = (typeof CATEGORY_LIST)[number]['levels'][number]['level'];
 
@@ -49,7 +50,7 @@ function createQuestions() {
         return {
           id: questionId,
           categoryId: category.id,
-          level: level.level,
+          level: toDbLevel(level.level),
           text: buildQuestionText(category.id, level.level, index + 1),
           choices: buildQuestionChoices(category.id),
           correctIndex: 1,

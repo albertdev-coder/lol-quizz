@@ -11,6 +11,17 @@ export type QuizLevel =
   | 'entusiasta'
   | 'otaku_mater';
 
+export type DbQuizLevel =
+  | 'Principiante'
+  | 'Intermedio'
+  | 'Avanzado'
+  | 'Aprendiz'
+  | 'Creyente'
+  | 'Sabio'
+  | 'Fan'
+  | 'Entusiasta'
+  | 'Otaku Mater.';
+
 export interface Question {
   id: string;
   categoryId: QuizCategory;
