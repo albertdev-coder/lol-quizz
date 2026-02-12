@@ -1,69 +1,59 @@
 import 'server-only';
-import Database from 'better-sqlite3';
+
+import { and, eq, sql } from 'drizzle-orm';
 import { Question, QuizLevel } from '@/types/quiz';
+import { db } from '@/lib/db/client';
+import { questions } from '@/lib/db/schema';
 import { shuffleArray } from './quiz-utils';
 
-// Base de datos en modo lectura/escritura
-const db = new Database('db/quiz.db', { fileMustExist: true });
-
-/**
- * Convierte una fila de la base de datos en un objeto Question tipado.
- */
-function mapRowToQuestion(row: any): Question {
+function mapQuestion(row: typeof questions.$inferSelect): Question {
   return {
     id: row.id,
     text: row.text,
     level: row.level,
-    choices: JSON.parse(row.choices),
+    choices: row.choices,
     correctIndex: row.correctIndex,
-    explanation: row.explanation,
+    explanation: row.explanation ?? '',
     image: row.image,
   };
 }
 
-/**
- * Obtiene todas las preguntas sin filtros.
- */
-export function getAllQuestions(): Question[] {
-  const rows = db.prepare('SELECT * FROM questions').all();
-  return rows.map(mapRowToQuestion);
+export async function getAllQuestions(categoryId = 'ciencia'): Promise<Question[]> {
+  const rows = await db.select().from(questions).where(eq(questions.categoryId, categoryId));
+  return rows.map(mapQuestion);
 }
 
-/**
- * Obtiene preguntas filtradas por nivel.
- */
-export function getQuestionsByLevel(level: QuizLevel): Question[] {
+export async function getQuestionsByLevel(level: QuizLevel, categoryId = 'ciencia'): Promise<Question[]> {
   if (level === 'mixto') {
-    const rows = db.prepare('SELECT * FROM questions').all();
-    return shuffleArray<Question>(rows.map(mapRowToQuestion));
+    return getRandomQuestions(level, undefined, categoryId);
   }
 
-  const rows = db.prepare('SELECT * FROM questions WHERE level = ?').all(level);
-  return rows.map(mapRowToQuestion);
+  const rows = await db
+    .select()
+    .from(questions)
+    .where(and(eq(questions.categoryId, categoryId), eq(questions.level, level)));
+
+  return rows.map(mapQuestion);
 }
 
-/**
- * Obtiene preguntas aleatorias, con opción de nivel y cantidad.
- */
-export function getRandomQuestions(
+export async function getRandomQuestions(
   level?: QuizLevel,
-  count?: number
-): Question[] {
-  let rows: any[];
+  count = 10,
+  categoryId = 'ciencia'
+): Promise<Question[]> {
+  const whereClause = [eq(questions.categoryId, categoryId)];
 
-  if (!level || level === 'mixto') {
-    rows = db.prepare('SELECT * FROM questions').all();
-  } else {
-    rows = db.prepare('SELECT * FROM questions WHERE level = ?').all(level);
+  if (level && level !== 'mixto') {
+    whereClause.push(eq(questions.level, level));
   }
 
-  const questions: Question[] = shuffleArray<Question>(
-    rows.map(mapRowToQuestion)
-  );
+  const rows = await db
+    .select()
+    .from(questions)
+    .where(and(...whereClause))
+    .orderBy(sql`RANDOM()`)
+    .limit(count * 2);
 
-  if (count && count > 0) {
-    return questions.slice(0, count);
-  }
-
-  return questions;
+  const shuffled = shuffleArray(rows.map(mapQuestion));
+  return shuffled.slice(0, count);
 }
