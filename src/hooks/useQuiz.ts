@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Question, QuizLevel, UserAnswer, QuizResult } from '@/types/quiz';
+import { Question, QuizCategory, QuizLevel, UserAnswer, QuizResult } from '@/types/quiz';
 import { fetchQuestionsFromAPI } from '@/lib/quiz-client';
 import { calculateScore } from '@/lib/quiz-utils';
 
-export const useQuiz = (level: QuizLevel) => {
+export const useQuiz = (category: QuizCategory, level: QuizLevel | null) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
@@ -18,9 +18,12 @@ export const useQuiz = (level: QuizLevel) => {
     const loadQuestions = async () => {
       setIsLoading(true);
       try {
-        const loadedQuestions = await fetchQuestionsFromAPI(level, 10);
+        if (!level) {
+          setQuestions([]);
+          return;
+        }
+        const loadedQuestions = await fetchQuestionsFromAPI(category, level, 10);
         setQuestions(loadedQuestions);
-        // Guardar las preguntas en localStorage para la página de resultados
         localStorage.setItem('lastQuizQuestions', JSON.stringify(loadedQuestions));
         setStartTime(Date.now());
         setQuestionStartTime(Date.now());
@@ -32,7 +35,7 @@ export const useQuiz = (level: QuizLevel) => {
     };
 
     loadQuestions();
-  }, [level]);
+  }, [category, level]);
 
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
@@ -77,35 +80,12 @@ export const useQuiz = (level: QuizLevel) => {
       incorrectAnswers: questions.length - correctAnswers,
       score,
       timeSpent: totalTimeSpent,
-      level,
+      category,
+      level: level ?? "principiante",
       answers,
       date: new Date().toISOString(),
     };
-  }, [answers, questions.length, level, startTime]);
-
-  const reset = useCallback(() => {
-    setCurrentQuestionIndex(0);
-    setAnswers([]);
-    setStartTime(Date.now());
-    setQuestionStartTime(Date.now());
-    setIsFinished(false);
-    
-    const loadQuestions = async () => {
-      setIsLoading(true);
-      try {
-        const loadedQuestions = await fetchQuestionsFromAPI(level, 10);
-        setQuestions(loadedQuestions);
-        // Guardar las preguntas en localStorage para la página de resultados
-        localStorage.setItem('lastQuizQuestions', JSON.stringify(loadedQuestions));
-      } catch (error) {
-        console.error('Error loading questions:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadQuestions();
-  }, [level]);
+  }, [answers, category, level, questions.length, startTime]);
 
   return {
     currentQuestion,
@@ -117,8 +97,5 @@ export const useQuiz = (level: QuizLevel) => {
     progress,
     submitAnswer,
     getResults,
-    reset,
-    questions,
-    answers,
   };
 };

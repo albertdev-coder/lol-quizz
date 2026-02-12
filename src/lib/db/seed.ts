@@ -1,60 +1,104 @@
 import { eq, inArray, sql } from 'drizzle-orm';
-import { db, closeDbConnection } from './client';
-import { categories, metadata, questions } from './schema';
+import { closeDbConnection, db } from '@/lib/db/client';
+import { categories, metadata, questions } from '@/lib/db/schema';
+import { CATEGORY_CONFIG, CATEGORY_LIST } from '@/constants/quiz-categories';
 
-const baseCategories = [
-  { id: 'ciencia', slug: 'ciencia', name: 'Ciencia', description: 'Preguntas de ciencia general para todos los niveles.' },
-  { id: 'otaku', slug: 'otaku', name: 'Otaku', description: 'Preguntas de anime y cultura otaku.' },
-  { id: 'teologia', slug: 'teologia', name: 'Teología', description: 'Preguntas religiosas y de teología.' },
-] as const;
+type SeedLevel = (typeof CATEGORY_LIST)[number]['levels'][number]['level'];
 
-const extraQuestions = [
-  { id: 'q-901', categoryId: 'otaku', level: 'niño' as const, text: '¿Cómo se llama la criatura eléctrica más famosa de Pokémon?', choices: ['Charmander', 'Bulbasaur', 'Pikachu', 'Eevee'], correctIndex: 2, explanation: 'Pikachu es el compañero principal de Ash en la saga Pokémon.', image: null },
-  { id: 'q-902', categoryId: 'otaku', level: 'joven' as const, text: '¿Qué anime sigue la historia de Monkey D. Luffy buscando el One Piece?', choices: ['Naruto', 'One Piece', 'Bleach', 'Fairy Tail'], correctIndex: 1, explanation: 'One Piece narra el viaje de Luffy para convertirse en Rey de los Piratas.', image: null },
-  { id: 'q-903', categoryId: 'otaku', level: 'adulto' as const, text: '¿Qué estudio produjo la película “El viaje de Chihiro”?', choices: ['Toei Animation', 'Madhouse', 'Studio Ghibli', 'MAPPA'], correctIndex: 2, explanation: 'Studio Ghibli produjo la película ganadora del Óscar “El viaje de Chihiro”.', image: null },
-  { id: 'q-904', categoryId: 'teologia', level: 'niño' as const, text: '¿Cuál es el nombre del libro sagrado del cristianismo?', choices: ['Torá', 'Biblia', 'Corán', 'Vedas'], correctIndex: 1, explanation: 'La Biblia es el texto sagrado central del cristianismo.', image: null },
-  { id: 'q-905', categoryId: 'teologia', level: 'joven' as const, text: '¿Qué significa la palabra “teología” en su sentido general?', choices: ['Estudio de la tierra', 'Estudio de Dios', 'Estudio del lenguaje', 'Estudio de los números'], correctIndex: 1, explanation: 'Teología es la disciplina que estudia a Dios y lo relacionado con lo divino.', image: null },
-  { id: 'q-906', categoryId: 'teologia', level: 'adulto' as const, text: '¿Cómo se conoce la rama que busca justificar racionalmente la fe?', choices: ['Hermenéutica', 'Patrística', 'Apologética', 'Escatología'], correctIndex: 2, explanation: 'La apologética presenta fundamentos racionales y defensas de la fe.', image: null },
-] as const;
+const baseCategories = CATEGORY_LIST.map((category) => ({
+  id: category.id,
+  slug: category.id,
+  name: category.title,
+  description: category.description,
+}));
+
+const TOPICS: Record<string, string[]> = {
+  ciencia: ['física', 'biología', 'astronomía', 'química'],
+  teologia: ['historia bíblica', 'doctrina', 'ética', 'exégesis'],
+  anime: ['shōnen', 'personajes', 'estudios', 'tramas'],
+};
+
+function buildQuestionText(categoryId: string, level: SeedLevel, index: number): string {
+  if (categoryId === 'ciencia') return `Pregunta ${index} de ciencia (${level}): ¿Cuál concepto explica mejor este fenómeno?`;
+  if (categoryId === 'teologia') return `Pregunta ${index} de teología (${level}): ¿Qué afirmación representa mejor este tema?`;
+  return `Pregunta ${index} de anime (${level}): ¿Cuál opción coincide con la referencia planteada?`;
+}
+
+function buildQuestionChoices(categoryId: string): string[] {
+  if (categoryId === 'ciencia') return ['Hipótesis', 'Evidencia empírica', 'Mito popular', 'Suposición'];
+  if (categoryId === 'teologia') return ['Interpretación contextual', 'Lectura aislada', 'Tradición oral', 'Opinión personal'];
+  return ['Escena canónica', 'Dato inventado', 'Fanfic', 'Rumor'];
+}
+
+function buildExplanation(categoryId: string, level: SeedLevel): string {
+  if (categoryId === 'ciencia') return `En nivel ${level}, se prioriza la comprensión del método científico y el análisis crítico.`;
+  if (categoryId === 'teologia') return `En nivel ${level}, se evalúa comprensión doctrinal, contexto histórico y reflexión ética.`;
+  return `En nivel ${level}, se evalúa memoria de obras, personajes y coherencia narrativa del anime.`;
+}
+
+function createQuestions() {
+  const questionsPerLevel = 40;
+  let id = 1;
+
+  return CATEGORY_LIST.flatMap((category) =>
+    category.levels.flatMap((level) =>
+      Array.from({ length: questionsPerLevel }).map((_, index) => {
+        const questionId = `q-${String(id).padStart(3, '0')}`;
+        id += 1;
+
+        return {
+          id: questionId,
+          categoryId: category.id,
+          level: level.level,
+          text: buildQuestionText(category.id, level.level, index + 1),
+          choices: buildQuestionChoices(category.id),
+          correctIndex: 1,
+          explanation: buildExplanation(category.id, level.level),
+          image: null,
+        };
+      })
+    )
+  );
+}
 
 async function runSeed() {
   await db.insert(categories).values(baseCategories).onConflictDoNothing();
 
-  const existingQuestionIds = await db
-    .select({ id: questions.id })
-    .from(questions)
-    .where(inArray(questions.id, extraQuestions.map((q) => q.id)));
+  const seededQuestions = createQuestions();
+  const ids = seededQuestions.map((question) => question.id);
 
-  const existingSet = new Set(existingQuestionIds.map((q) => q.id));
-  const missingQuestions = extraQuestions.filter((q) => !existingSet.has(q.id));
+  await db.delete(questions).where(inArray(questions.id, ids));
+  await db.insert(questions).values(seededQuestions as any);
 
-  if (missingQuestions.length > 0) {
-    await db.insert(questions).values(missingQuestions as any);
-  }
+  const categorySummary = await Promise.all(
+    CATEGORY_LIST.map(async (category) => {
+      const [totalRow] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(questions)
+        .where(eq(questions.categoryId, category.id));
 
-  const [scienceCount] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(questions)
-    .where(eq(questions.categoryId, 'ciencia'));
+      const levelRows = await db
+        .select({ level: questions.level, count: sql<number>`count(*)::int` })
+        .from(questions)
+        .where(eq(questions.categoryId, category.id))
+        .groupBy(questions.level);
 
-  const countByLevel = await db
-    .select({ level: questions.level, count: sql<number>`count(*)::int` })
-    .from(questions)
-    .where(eq(questions.categoryId, 'ciencia'))
-    .groupBy(questions.level);
-
-  const levels = countByLevel.reduce(
-    (acc, row) => ({ ...acc, [row.level]: row.count }),
-    {} as Record<string, number>
+      return {
+        category: category.id,
+        totalQuestions: totalRow?.count ?? 0,
+        levels: levelRows.reduce<Record<string, number>>((acc, row) => {
+          acc[row.level] = row.count;
+          return acc;
+        }, {}),
+        topics: TOPICS[category.id],
+      };
+    })
   );
 
   const metadataRows = [
-    { key: 'category', value: 'Ciencia', type: 'string' },
-    { key: 'totalQuestions', value: String(scienceCount?.count ?? 0), type: 'number' },
-    { key: 'levels', value: JSON.stringify(levels), type: 'json' },
+    { key: 'categoriesSummary', value: JSON.stringify(categorySummary), type: 'json' },
     { key: 'generatedAt', value: new Date().toISOString(), type: 'string' },
-    { key: 'topics', value: JSON.stringify(['astronomía', 'biología', 'física', 'química']), type: 'json' },
-    { key: 'version', value: '2.0.0', type: 'string' },
+    { key: 'version', value: '3.0.0', type: 'string' },
   ];
 
   for (const row of metadataRows) {

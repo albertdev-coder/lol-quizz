@@ -9,8 +9,28 @@ import {
   index,
 } from 'drizzle-orm/pg-core';
 
-export const questionLevelEnum = pgEnum('question_level', ['niño', 'joven', 'adulto']);
-export const resultLevelEnum = pgEnum('result_level', ['niño', 'joven', 'adulto', 'mixto']);
+export const questionLevelEnum = pgEnum('question_level', [
+  'principiante',
+  'intermedio',
+  'avanzado',
+  'aprendiz',
+  'creyente',
+  'sabio',
+  'fan',
+  'entusiasta',
+  'otaku_mater',
+]);
+export const resultLevelEnum = pgEnum('result_level', [
+  'principiante',
+  'intermedio',
+  'avanzado',
+  'aprendiz',
+  'creyente',
+  'sabio',
+  'fan',
+  'entusiasta',
+  'otaku_mater',
+]);
 
 export const categories = pgTable(
   'categories',
@@ -49,6 +69,7 @@ export const results = pgTable(
   'results',
   {
     id: text('id').primaryKey(),
+    category: text('category').notNull(),
     level: resultLevelEnum('level').notNull(),
     score: integer('score').notNull(),
     totalQuestions: integer('total_questions').notNull(),
