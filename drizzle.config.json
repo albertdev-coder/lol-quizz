@@ -1,10 +1,8 @@
-import "dotenv/config";
-
-export default {
-  schema: "./src/lib/db/schema.ts",
-  out: "./drizzle",
-  dialect: "postgresql",
-  dbCredentials: {
-    connectionString: process.env.DATABASE_URL
+{
+  "schema": "./src/lib/db/schema.ts",
+  "out": "./drizzle",
+  "dialect": "postgresql",
+  "dbCredentials": {
+    "url": "postgresql://albert:mi_password_segura@localhost:5432/lol_quizz"
   }
-};
+}

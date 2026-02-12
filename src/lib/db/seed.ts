@@ -1,6 +1,6 @@
 import { eq, inArray, sql } from 'drizzle-orm';
-import { db, closeDbConnection } from '@/lib/db/client';
-import { categories, metadata, questions } from '@/lib/db/schema';
+import { db, closeDbConnection } from './client';
+import { categories, metadata, questions } from './schema';
 
 const baseCategories = [
   { id: 'ciencia', slug: 'ciencia', name: 'Ciencia', description: 'Preguntas de ciencia general para todos los niveles.' },
