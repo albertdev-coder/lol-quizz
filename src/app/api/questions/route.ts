@@ -8,9 +8,9 @@ import {
 } from '@/lib/api/response';
 import { logger } from '@/lib/api/logger';
 import { GetQuestionsQuerySchema } from '@/lib/validation/schemas';
-import { sanitizeSQLInput } from '@/lib/security/sanitize';
 import { db } from '@/lib/db/client';
 import { categories, questions } from '@/lib/db/schema';
+import { toAppLevel, toDbLevel } from '@/constants/quiz-levels';
 
 export async function GET(request: NextRequest) {
   return withErrorHandler(async () => {
@@ -44,9 +44,8 @@ export async function GET(request: NextRequest) {
 
       const whereClause = [eq(questions.categoryId, categoryRow[0].id)];
 
-      if (level && level !== 'mixto') {
-        const sanitizedLevel = sanitizeSQLInput(level);
-        whereClause.push(eq(questions.level, sanitizedLevel as 'niño' | 'joven' | 'adulto'));
+      if (level) {
+        whereClause.push(eq(questions.level, toDbLevel(level)));
       }
 
       const rows = await db
@@ -56,11 +55,16 @@ export async function GET(request: NextRequest) {
         .orderBy(sql`RANDOM()`)
         .limit(Math.min(count, 50));
 
+      const normalizedRows = rows.map((row) => ({
+        ...row,
+        level: toAppLevel(row.level),
+      }));
+
       const duration = Date.now() - startTime;
       logger.apiResponse('GET', '/api/questions', 200, duration);
 
-      return createSuccessResponse(rows, {
-        total: rows.length,
+      return createSuccessResponse(normalizedRows, {
+        total: normalizedRows.length,
         requested: count,
         level: level || 'all',
         category,

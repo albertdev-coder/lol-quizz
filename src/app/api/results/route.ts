@@ -12,6 +12,7 @@ import { SaveResultBodySchema, GetResultsQuerySchema } from '@/lib/validation/sc
 import { sanitizeObject } from '@/lib/security/sanitize';
 import { db } from '@/lib/db/client';
 import { results } from '@/lib/db/schema';
+import { toAppLevel, toDbLevel } from '@/constants/quiz-levels';
 
 export async function POST(request: NextRequest) {
   return withErrorHandler(async () => {
@@ -41,7 +42,8 @@ export async function POST(request: NextRequest) {
     try {
       const result = {
         id: `result-${Date.now()}`,
-        level: validatedData.level,
+        category: validatedData.category,
+        level: toDbLevel(validatedData.level),
         score: validatedData.score,
         totalQuestions: validatedData.totalQuestions,
         correctAnswers: validatedData.correctAnswers,
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
           id: result.id,
           timestamp: result.date.toISOString(),
           score: result.score,
+          category: result.category,
           level: result.level,
         },
         { message: 'Result saved successfully' }
@@ -98,18 +101,23 @@ export async function GET(request: NextRequest) {
 
     try {
       const query = db.select().from(results);
-      const withLevel = level && level !== 'mixto' ? query.where(eq(results.level, level)) : query;
+      const withLevel = level ? query.where(eq(results.level, toDbLevel(level))) : query;
 
       const rows = await withLevel
         .orderBy(sortBy === 'score' ? desc(results.score) : desc(results.date))
         .limit(limit);
 
+      const normalizedRows = rows.map((row) => ({
+        ...row,
+        level: toAppLevel(row.level),
+      }));
+
       const duration = Date.now() - startTime;
       logger.apiResponse('GET', '/api/results', 200, duration);
 
-      return createSuccessResponse(rows, {
-        total: rows.length,
-        showing: rows.length,
+      return createSuccessResponse(normalizedRows, {
+        total: normalizedRows.length,
+        showing: normalizedRows.length,
         filters: {
           level: level || 'all',
           limit,

@@ -3,12 +3,14 @@ import 'server-only';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/client';
 import { questions, results } from '@/lib/db/schema';
+import { QuizCategory, QuizLevel } from '@/types/quiz';
+import { toAppLevel, toDbLevel } from '@/constants/quiz-levels';
 
-export async function getQuestions(level?: string, count?: number, categoryId = 'ciencia') {
+export async function getQuestions(level?: QuizLevel, count?: number, categoryId: QuizCategory = 'ciencia') {
   const whereClause = [eq(questions.categoryId, categoryId)];
 
-  if (level && level !== 'mixto') {
-    whereClause.push(eq(questions.level, level as 'niño' | 'joven' | 'adulto'));
+  if (level) {
+    whereClause.push(eq(questions.level, toDbLevel(level)));
   }
 
   const rows = await db
@@ -18,17 +20,18 @@ export async function getQuestions(level?: string, count?: number, categoryId = 
     .orderBy(sql`RANDOM()`)
     .limit(count ?? 10);
 
-  return rows;
+  return rows.map((row) => ({ ...row, level: toAppLevel(row.level) }));
 }
 
 export async function getQuestionById(id: string) {
   const row = await db.select().from(questions).where(eq(questions.id, id)).limit(1);
-  return row[0];
+  return row[0] ? { ...row[0], level: toAppLevel(row[0].level) } : undefined;
 }
 
 export async function saveResult(result: {
   id: string;
-  level: 'niño' | 'joven' | 'adulto' | 'mixto';
+  category: QuizCategory;
+  level: QuizLevel;
   score: number;
   totalQuestions: number;
   correctAnswers: number;
@@ -39,16 +42,19 @@ export async function saveResult(result: {
 }) {
   await db.insert(results).values({
     ...result,
+    level: toDbLevel(result.level),
     date: new Date(result.date),
   });
 }
 
-export async function getResults(level?: string, limit = 10, sortBy: 'date' | 'score' = 'date') {
+export async function getResults(level?: QuizLevel, limit = 10, sortBy: 'date' | 'score' = 'date') {
   const query = db.select().from(results);
 
-  const whereQuery = level && level !== 'mixto' ? query.where(eq(results.level, level as any)) : query;
+  const whereQuery = level ? query.where(eq(results.level, toDbLevel(level))) : query;
 
-  return whereQuery
+  const rows = await whereQuery
     .orderBy(sortBy === 'score' ? desc(results.score) : desc(results.date))
     .limit(limit);
+
+  return rows.map((row) => ({ ...row, level: toAppLevel(row.level) }));
 }

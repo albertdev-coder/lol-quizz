@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="icon-ciencia" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9 2h6v2h-1v4.59l4.95 8.58A3 3 0 0 1 16.35 22H7.65a3 3 0 0 1-2.6-4.83L10 8.59V4H9V2Zm2.3 8L6.78 18a1 1 0 0 0 .87 1.5h8.7a1 1 0 0 0 .87-1.5L12.7 10h-1.4Z" />
+  </symbol>
+
+  <symbol id="icon-teologia" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M11 3h2v7h7v2h-7v9h-2v-9H4v-2h7V3Z" />
+    <circle cx="12" cy="12" r="9.25" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3" />
+  </symbol>
+
+  <symbol id="icon-anime" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2c4.8 0 8.7 3.9 8.7 8.7 0 4.9-3.5 9.4-8.7 11.3-5.2-1.9-8.7-6.4-8.7-11.3C3.3 5.9 7.2 2 12 2Zm0 3.1a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Zm0 9.5c-2.6 0-5 .9-6.9 2.4 1.4 1.9 3.5 3.4 6.9 4.7 3.4-1.3 5.5-2.8 6.9-4.7a11.2 11.2 0 0 0-6.9-2.4Z" />
+  </symbol>
+</svg>
