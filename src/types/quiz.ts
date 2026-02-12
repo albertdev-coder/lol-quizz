@@ -1,7 +1,19 @@
-export type QuizLevel = 'niño' | 'joven' | 'adulto' | 'mixto';
+export type QuizCategory = 'ciencia' | 'teologia' | 'anime';
+
+export type QuizLevel =
+  | 'principiante'
+  | 'intermedio'
+  | 'avanzado'
+  | 'aprendiz'
+  | 'creyente'
+  | 'sabio'
+  | 'fan'
+  | 'entusiasta'
+  | 'otaku_mater';
 
 export interface Question {
   id: string;
+  categoryId: QuizCategory;
   level: QuizLevel;
   text: string;
   choices: string[];
@@ -15,6 +27,7 @@ export interface QuizState {
   answers: UserAnswer[];
   startTime: number;
   endTime?: number;
+  category: QuizCategory;
   level: QuizLevel;
 }
 
@@ -32,16 +45,14 @@ export interface QuizResult {
   incorrectAnswers: number;
   score: number;
   timeSpent: number;
+  category: QuizCategory;
   level: QuizLevel;
   answers: UserAnswer[];
   date: string;
 }
 
 export interface QuizMetadata {
-  category: string;
-  totalQuestions: number;
-  levels: Record<string, number>;
+  categories: Record<QuizCategory, { totalQuestions: number; levels: Record<string, number> }>;
   generatedAt: string;
-  topics: string[];
   version: string;
 }

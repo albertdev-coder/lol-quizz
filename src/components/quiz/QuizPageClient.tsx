@@ -1,29 +1,25 @@
-// src/components/quiz/QuizPageClient.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { QuizLevel } from '@/types/quiz';
+import { Home, Loader2 } from 'lucide-react';
 import { useQuiz } from '@/hooks/useQuiz';
 import { LevelSelector } from '@/components/quiz/LevelSelector';
 import { QuestionCard } from '@/components/quiz/QuestionCard';
 import { QuizProgress } from '@/components/quiz/QuizProgress';
 import { Button } from '@/components/ui/button';
-import { Home, Loader2 } from 'lucide-react';
+import { isQuizCategory } from '@/constants/quiz-categories';
+import { QuizCategory, QuizLevel } from '@/types/quiz';
 
 export default function QuizPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedLevel, setSelectedLevel] = useState<QuizLevel | null>(null);
-  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-    const levelParam = searchParams.get('level') as QuizLevel | null;
-    if (levelParam && ['niño', 'joven', 'adulto', 'mixto'].includes(levelParam)) {
-      setSelectedLevel(levelParam);
-    }
+  const category = useMemo<QuizCategory>(() => {
+    const categoryParam = searchParams.get('category');
+    return isQuizCategory(categoryParam) ? categoryParam : 'ciencia';
   }, [searchParams]);
 
   const {
@@ -35,7 +31,11 @@ export default function QuizPageClient() {
     progress,
     submitAnswer,
     getResults,
-  } = useQuiz(selectedLevel || 'niño');
+  } = useQuiz(category, selectedLevel);
+
+  useEffect(() => {
+    setSelectedLevel(null);
+  }, [category]);
 
   useEffect(() => {
     if (isFinished) {
@@ -43,69 +43,37 @@ export default function QuizPageClient() {
       localStorage.setItem('lastQuizResults', JSON.stringify(results));
       router.push('/results');
     }
-  }, [isFinished, getResults, router]);
-
-  if (!isClient) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 animate-spin" style={{ color: 'var(--color-purple-dark)' }} />
-      </div>
-    );
-  }
+  }, [getResults, isFinished, router]);
 
   if (!selectedLevel) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+      <div className="min-h-screen p-4 py-10">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto mb-8 w-fit">
           <Button
             onClick={() => router.push('/')}
             variant="outline"
-            className="rounded-full hover:opacity-80"
-            style={{ borderWidth: '2px', borderColor: 'var(--color-purple-light)' }}
+            className="rounded-full border-2 border-violet-200 hover:bg-violet-50"
           >
-            <Home className="w-4 h-4 mr-2" />
+            <Home className="mr-2 h-4 w-4" />
             Volver al inicio
           </Button>
         </motion.div>
-        <LevelSelector onSelectLevel={setSelectedLevel} />
+        <LevelSelector category={category} onSelectLevel={setSelectedLevel} />
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-        >
-          <Loader2 className="w-16 h-16" style={{ color: 'var(--color-purple-dark)' }} />
-        </motion.div>
-        <p className="mt-6 text-xl font-medium" style={{ color: 'var(--color-gray-700)' }}>
-          Cargando preguntas...
-        </p>
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <Loader2 className="h-14 w-14 animate-spin text-violet-700" />
+        <p className="mt-4 text-lg text-slate-700">Cargando preguntas...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 py-12">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <Button
-          onClick={() => {
-            if (confirm('¿Estás seguro de que quieres salir del quiz? Perderás tu progreso.')) {
-              router.push('/');
-            }
-          }}
-          variant="outline"
-          className="rounded-full hover:opacity-80"
-          style={{ borderWidth: '2px', borderColor: 'var(--color-purple-light)' }}
-        >
-          <Home className="w-4 h-4 mr-2" />
-          Salir
-        </Button>
-      </motion.div>
-
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 py-12">
       <QuizProgress current={currentQuestionIndex + 1} total={totalQuestions} progress={progress} />
 
       <AnimatePresence mode="wait">

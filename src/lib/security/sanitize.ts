@@ -74,14 +74,15 @@ export function sanitizeInteger(
 /**
  * Sanitize level enum
  */
-export function sanitizeLevel(input: string): 'niño' | 'joven' | 'adulto' | 'mixto' | null {
+export function sanitizeLevel(input: string): string | null {
   const normalized = sanitizeString(input).toLowerCase();
+  const validLevels = [
+    'principiante', 'intermedio', 'avanzado',
+    'aprendiz', 'creyente', 'sabio',
+    'fan', 'entusiasta', 'otaku_mater',
+  ];
 
-  if (['niño', 'joven', 'adulto', 'mixto'].includes(normalized)) {
-    return normalized as 'niño' | 'joven' | 'adulto' | 'mixto';
-  }
-
-  return null;
+  return validLevels.includes(normalized) ? normalized : null;
 }
 
 /**

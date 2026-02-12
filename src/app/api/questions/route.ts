@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
 
       const whereClause = [eq(questions.categoryId, categoryRow[0].id)];
 
-      if (level && level !== 'mixto') {
+      if (level) {
         const sanitizedLevel = sanitizeSQLInput(level);
-        whereClause.push(eq(questions.level, sanitizedLevel as 'niño' | 'joven' | 'adulto'));
+        whereClause.push(eq(questions.level, sanitizedLevel as any));
       }
 
       const rows = await db

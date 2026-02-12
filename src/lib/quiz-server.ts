@@ -9,6 +9,7 @@ import { shuffleArray } from './quiz-utils';
 function mapQuestion(row: typeof questions.$inferSelect): Question {
   return {
     id: row.id,
+    categoryId: row.categoryId as Question['categoryId'],
     text: row.text,
     level: row.level,
     choices: row.choices,
@@ -24,10 +25,6 @@ export async function getAllQuestions(categoryId = 'ciencia'): Promise<Question[
 }
 
 export async function getQuestionsByLevel(level: QuizLevel, categoryId = 'ciencia'): Promise<Question[]> {
-  if (level === 'mixto') {
-    return getRandomQuestions(level, undefined, categoryId);
-  }
-
   const rows = await db
     .select()
     .from(questions)
@@ -37,13 +34,13 @@ export async function getQuestionsByLevel(level: QuizLevel, categoryId = 'cienci
 }
 
 export async function getRandomQuestions(
-  level?: QuizLevel,
+  level: QuizLevel | undefined,
   count = 10,
   categoryId = 'ciencia'
 ): Promise<Question[]> {
   const whereClause = [eq(questions.categoryId, categoryId)];
 
-  if (level && level !== 'mixto') {
+  if (level) {
     whereClause.push(eq(questions.level, level));
   }
 

@@ -54,11 +54,11 @@ export default function ResultsPage() {
   const handleShare = () => {
     if (!results) return;
     
-    const text = `¡Obtuve ${results.score}% en el Quiz de Ciencia! ${getScoreMessage(results.score).emoji}`;
+    const text = `¡Obtuve ${results.score}% en el quiz de ${results.category}! ${getScoreMessage(results.score).emoji}`;
     
     if (navigator.share) {
       navigator.share({
-        title: 'Quiz Ciencia - Mis Resultados',
+        title: `Quiz ${results.category} - Mis Resultados`,
         text: text,
         url: window.location.origin,
       }).catch(() => {

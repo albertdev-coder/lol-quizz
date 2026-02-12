@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
     try {
       const result = {
         id: `result-${Date.now()}`,
+        category: validatedData.category,
         level: validatedData.level,
         score: validatedData.score,
         totalQuestions: validatedData.totalQuestions,
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest) {
           id: result.id,
           timestamp: result.date.toISOString(),
           score: result.score,
+          category: result.category,
           level: result.level,
         },
         { message: 'Result saved successfully' }
@@ -98,7 +100,7 @@ export async function GET(request: NextRequest) {
 
     try {
       const query = db.select().from(results);
-      const withLevel = level && level !== 'mixto' ? query.where(eq(results.level, level)) : query;
+      const withLevel = level ? query.where(eq(results.level, level)) : query;
 
       const rows = await withLevel
         .orderBy(sortBy === 'score' ? desc(results.score) : desc(results.date))
