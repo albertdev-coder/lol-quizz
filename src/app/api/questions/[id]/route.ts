@@ -9,7 +9,7 @@ import {
 import { logger } from '@/lib/api/logger';
 import { QuestionIdSchema } from '@/lib/validation/schemas';
 import { sanitizeQuestionId } from '@/lib/security/sanitize';
-import { getDB } from '@/lib/db-singleton';
+import { getQuestionById } from '@/lib/db';
 
 /**
  * Get Question by ID
@@ -25,7 +25,6 @@ export async function GET(
     
     logger.apiRequest('GET', `/api/questions/${id}`);
     
-    // Sanitize ID
     const sanitizedId = sanitizeQuestionId(id);
     
     if (!sanitizedId) {
@@ -33,7 +32,6 @@ export async function GET(
       return createNotFoundError('Question');
     }
     
-    // Validate with Zod
     const validationResult = QuestionIdSchema.safeParse(sanitizedId);
     
     if (!validationResult.success) {
@@ -42,31 +40,12 @@ export async function GET(
     }
 
     try {
-      const db = getDB();
-      
-      const row = db.prepare('SELECT * FROM questions WHERE id = ?').get(sanitizedId);
+      const question = await getQuestionById(sanitizedId);
 
-      if (!row) {
+      if (!question) {
         const duration = Date.now() - startTime;
         logger.apiResponse('GET', `/api/questions/${id}`, 404, duration);
         return createNotFoundError('Question');
-      }
-
-      // Parse choices field safely
-      let question: any;
-      try {
-        question = {
-          ...row,
-          choices: typeof (row as any).choices === 'string' 
-            ? JSON.parse((row as any).choices) 
-            : (row as any).choices
-        };
-      } catch (parseError) {
-        logger.warn(`Failed to parse choices for question ${id}`, { error: parseError });
-        question = {
-          ...row,
-          choices: []
-        };
       }
 
       const duration = Date.now() - startTime;

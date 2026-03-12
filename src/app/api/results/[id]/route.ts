@@ -9,7 +9,7 @@ import {
 import { logger } from '@/lib/api/logger';
 import { ResultIdSchema } from '@/lib/validation/schemas';
 import { sanitizeResultId } from '@/lib/security/sanitize';
-import { getDB } from '@/lib/db-singleton';
+import { getResultById } from '@/lib/db';
 
 /**
  * Get Result by ID
@@ -25,7 +25,6 @@ export async function GET(
     
     logger.apiRequest('GET', `/api/results/${id}`);
     
-    // Sanitize ID
     const sanitizedId = sanitizeResultId(id);
     
     if (!sanitizedId) {
@@ -33,7 +32,6 @@ export async function GET(
       return createNotFoundError('Result');
     }
     
-    // Validate with Zod
     const validationResult = ResultIdSchema.safeParse(sanitizedId);
     
     if (!validationResult.success) {
@@ -42,31 +40,12 @@ export async function GET(
     }
 
     try {
-      const db = getDB();
-      
-      const row = db.prepare('SELECT * FROM results WHERE id = ?').get(sanitizedId);
+      const result = await getResultById(sanitizedId);
 
-      if (!row) {
+      if (!result) {
         const duration = Date.now() - startTime;
         logger.apiResponse('GET', `/api/results/${id}`, 404, duration);
         return createNotFoundError('Result');
-      }
-
-      // Parse answers field safely
-      let result: any;
-      try {
-        result = {
-          ...row,
-          answers: typeof (row as any).answers === 'string' 
-            ? JSON.parse((row as any).answers) 
-            : (row as any).answers
-        };
-      } catch (parseError) {
-        logger.warn(`Failed to parse answers for result ${id}`, { error: parseError });
-        result = {
-          ...row,
-          answers: []
-        };
       }
 
       const duration = Date.now() - startTime;

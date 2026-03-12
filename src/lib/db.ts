@@ -1,83 +1,95 @@
-import 'server-only';
-import Database from 'better-sqlite3';
-import path from 'path';
+import { getDB } from '@/lib/db-singleton';
+import { questions, results } from '@/db/schema';
+import { eq, desc } from 'drizzle-orm';
+import type { PgTable } from 'drizzle-orm/pg-core';
 
-const dbPath = path.join(process.cwd(), 'db', 'quiz.db');
-const db = new Database(dbPath);
-
-/**
- * SERVER-ONLY: Get questions from database with optional filtering
- * This function can only be used in server components and API routes
- * @param level - Optional level filter (omit or use 'mixto' for all levels)
- * @param count - Optional limit on number of questions
- * @returns Array of question records from database
- */
-export function getQuestions(level?: string, count?: number) {
-  let query = 'SELECT * FROM questions';
-  const params: any[] = [];
-
+export async function getQuestions(level?: string, count = 10) {
+  const db = getDB();
+  
+  let query = db.select().from(questions);
+  
   if (level && level !== 'mixto') {
-    query += ' WHERE level = ?';
-    params.push(level);
+    query = query.where(eq(questions.level, level)) as typeof query;
   }
-
-  query += ' ORDER BY RANDOM()';
-  if (count) {
-    query += ' LIMIT ?';
-    params.push(count);
-  }
-
-  return db.prepare(query).all(...params);
+  
+  const allQuestions = await query;
+  
+  const shuffled = allQuestions.sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, Math.min(count, shuffled.length));
+  
+  return selected.map((q) => ({
+    id: q.id,
+    text: q.question,
+    level: q.level,
+    choices: q.choices as string[],
+    correctIndex: q.correctAnswer,
+    explanation: q.explanation || '',
+    image: null,
+  }));
 }
 
-/**
- * SERVER-ONLY: Get a single question by ID from database
- * This function can only be used in server components and API routes
- * @param id - Question ID
- * @returns Question record or undefined if not found
- */
-export function getQuestionById(id: string) {
-  return db.prepare('SELECT * FROM questions WHERE id = ?').get(id);
+export async function getQuestionById(id: string) {
+  const db = getDB();
+  const result = await db.select().from(questions).where(eq(questions.id, id)).limit(1);
+  if (!result[0]) return null;
+  
+  const q = result[0];
+  return {
+    id: q.id,
+    text: q.question,
+    level: q.level,
+    choices: q.choices as string[],
+    correctIndex: q.correctAnswer,
+    explanation: q.explanation || '',
+    image: null,
+  };
 }
 
-/**
- * SERVER-ONLY: Save a quiz result to database
- * This function can only be used in server components and API routes
- * @param result - Quiz result object to save
- */
-export function saveResult(result: any) {
-  db.prepare(
-    `INSERT INTO results 
-     (id, level, score, totalQuestions, correctAnswers, incorrectAnswers, timeSpent, date, answers) 
-     VALUES (@id, @level, @score, @totalQuestions, @correctAnswers, @incorrectAnswers, @timeSpent, @date, @answers)`
-  ).run(result);
+export async function saveResult(result: {
+  id: string;
+  level: string;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  timeSpent: number;
+  date: string;
+  answers: unknown;
+}) {
+  const db = getDB();
+  await db.insert(results).values({
+    id: result.id,
+    level: result.level,
+    score: result.score,
+    totalQuestions: result.totalQuestions,
+    correctAnswers: result.correctAnswers,
+    incorrectAnswers: result.incorrectAnswers,
+    timeSpent: result.timeSpent,
+    date: new Date(result.date),
+    answers: result.answers as never,
+  });
 }
 
-/**
- * SERVER-ONLY: Get quiz results from database with optional filtering
- * This function can only be used in server components and API routes
- * @param level - Optional level filter (omit or use 'mixto' for all levels)
- * @param limit - Maximum number of results to return (default: 10)
- * @param sortBy - Sort field: 'date' or 'score' (default: 'date')
- * @returns Array of result records from database
- */
-export function getResults(level?: string, limit = 10, sortBy = 'date') {
-  let query = 'SELECT * FROM results';
-  const params: any[] = [];
-
+export async function getResults(level?: string, limit = 10, sortBy = 'date') {
+  const db = getDB();
+  
+  let query = db.select().from(results);
+  
   if (level && level !== 'mixto') {
-    query += ' WHERE level = ?';
-    params.push(level);
+    query = query.where(eq(results.level, level)) as typeof query;
   }
-
+  
   if (sortBy === 'score') {
-    query += ' ORDER BY score DESC';
+    query = query.orderBy(desc(results.score)) as typeof query;
   } else {
-    query += ' ORDER BY date DESC';
+    query = query.orderBy(desc(results.date)) as typeof query;
   }
+  
+  return query.limit(limit);
+}
 
-  query += ' LIMIT ?';
-  params.push(limit);
-
-  return db.prepare(query).all(...params);
+export async function getResultById(id: string) {
+  const db = getDB();
+  const result = await db.select().from(results).where(eq(results.id, id)).limit(1);
+  return result[0];
 }
