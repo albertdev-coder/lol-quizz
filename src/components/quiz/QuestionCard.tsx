@@ -37,7 +37,7 @@ export function QuestionCard({
       onAnswer(selectedIndex);
       setSelectedIndex(null);
       setHasAnswered(false);
-    }, 1500);
+    }, 3000);
   };
 
   const getChoiceStyle = (index: number) => {
