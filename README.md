@@ -1,552 +1,214 @@
-# 🧪 Quiz Ciencia - Aplicación Educativa de Preguntas
+# 🧪 Quiz Ciencia - Science Quiz Application
 
-Una aplicación web progresiva (PWA) interactiva para aprender ciencia de forma divertida. Con preguntas diseñadas para tres niveles de dificultad: Niño, Joven y Adulto.
+An interactive science quiz web application to test knowledge in astronomy, biology, physics, and chemistry. Built with modern technologies for a fast, accessible, and professional user experience.
 
-## 🌟 Características
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-- ✨ **30 Preguntas de Ciencia**: Categoría completa con temas de astronomía, biología, física, química y ciencias naturales
-- 🎯 **Tres Niveles de Dificultad**: Niño, Joven, Adulto + Modo Mixto
-- 🎨 **Diseño Cartoon Vibrante**: Interfaz colorida y animada con Framer Motion
-- 📱 **PWA Completa**: Instalable en dispositivos móviles y compatible con ChromeOS
-- 🏆 **Sistema de Puntuación**: Feedback inmediato con explicaciones detalladas
-- 🎉 **Celebraciones Animadas**: Confetti y animaciones al completar el quiz
-- 💾 **Almacenamiento Local**: Guarda resultados en localStorage y archivo JSON
-- 🔌 **API REST**: Endpoints para obtener preguntas y guardar resultados
-- ⚡ **Optimizado para ARM64**: Funciona perfectamente en Chromebooks de bajos recursos
+## 🌟 Features
 
-## 🚀 Tecnologías Utilizadas
+- 🧪 **100 Science Questions**: Topics include astronomy, biology, physics, and chemistry
+- 🎯 **Three Difficulty Levels**: Niño, Joven, Adulto + Mixto mode
+- 💡 **Detailed Explanations**: Every answer includes an explanation
+- 📱 **Fully Responsive**: Works on mobile, tablet, and desktop
+- 🌙 **Dark Mode**: Automatic theme switching
+- ⚡ **Fast Performance**: Built with Next.js Server Components
+- 🔒 **Input Validation**: All API inputs validated with Zod
+- ☁️ **Cloud Database**: PostgreSQL hosted on Neon
 
-- **Next.js 15** (App Router)
-- **React 19**
-- **TypeScript**
-- **Tailwind CSS 4**
-- **Radix UI** (componentes accesibles)
-- **Framer Motion** (animaciones)
-- **Lucide React** (iconos)
-- **React Confetti** (celebraciones)
+## 🛠️ Tech Stack
 
-## 📦 Instalación
+| Category | Technology |
+|----------|------------|
+| **Framework** | Next.js 16 (App Router) |
+| **Language** | TypeScript |
+| **Database** | PostgreSQL (Neon) |
+| **ORM** | Drizzle ORM |
+| **UI** | React 19, Radix UI |
+| **Styling** | Tailwind CSS 4 |
+| **Animations** | Framer Motion |
+| **Validation** | Zod |
+| **Deployment** | Railway |
 
-### Requisitos previos
-- Node.js 18+ o 20+
-- pnpm (recomendado) o npm
-
-### Pasos
+## 📦 Installation
 
 ```bash
-# Clonar el repositorio
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/yourusername/lol-quizz.git
 cd lol-quizz
 
-# Instalar dependencias
+# Install dependencies
 pnpm install
 
-# Iniciar servidor de desarrollo
+# Setup environment variables
+cp .env.example .env
+# Edit .env with your DATABASE_URL
+
+# Push database schema
+pnpm db:push
+
+# Run development server
 pnpm dev
-
-# Construir para producción
-pnpm build
-
-# Iniciar en producción
-pnpm start
 ```
 
-La aplicación estará disponible en `http://localhost:3000`
+## 🔧 Available Scripts
 
-## 📂 Estructura del Proyecto
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run ESLint |
+| `pnpm db:push` | Push schema to database |
+| `pnpm db:studio` | Open Drizzle Studio |
+
+## 📁 Project Structure
 
 ```
 lol-quizz/
-├── data/
-│   ├── questions.json      # 30 preguntas de ciencia
-│   ├── metadata.json       # Metadatos del quiz
-│   └── results.json        # Resultados guardados
-├── public/
-│   ├── icons/              # Iconos PWA
-│   ├── manifest.json       # Manifiesto PWA
-│   └── sw.js              # Service Worker
-├── scripts/
-│   └── validate-questions.mjs  # Script de validación
 ├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── health/    # Health check endpoint
-│   │   │   ├── questions/ # Endpoints de preguntas
-│   │   │   └── results/   # Endpoints de resultados
-│   │   ├── page.tsx       # Página principal
-│   │   ├── quiz/
-│   │   │   └── page.tsx   # Página del quiz
-│   │   └── results/
-│   │       └── page.tsx   # Página de resultados
-│   ├── components/
-│   │   ├── quiz/
-│   │   │   ├── LevelSelector.tsx
-│   │   │   ├── QuestionCard.tsx
-│   │   │   └── QuizProgress.tsx
-│   │   └── ui/            # Componentes Radix UI
-│   ├── hooks/
-│   │   └── useQuiz.ts     # Hook personalizado del quiz
-│   ├── lib/
-│   │   └── quiz-utils.ts  # Utilidades del quiz
-│   └── types/
-│       └── quiz.ts        # Tipos TypeScript
-├── package.json
-└── README.md
+│   ├── app/              # Next.js App Router pages
+│   │   ├── api/          # API routes
+│   │   │   ├── health/
+│   │   │   ├── questions/
+│   │   │   └── results/
+│   │   ├── quiz/         # Quiz page
+│   │   └── page.tsx      # Home page
+│   ├── components/       # React components
+│   │   └── quiz/         # Quiz-specific components
+│   ├── lib/              # Utility functions
+│   │   ├── db.ts         # Database operations
+│   │   ├── db-singleton.ts
+│   │   └── validation/   # Zod schemas
+│   ├── db/               # Database schema (Drizzle)
+│   └── types/            # TypeScript types
+├── .github/              # GitHub Actions workflows
+│   └── workflows/
+│       └── ci-cd.yml
+├── public/               # Static assets
+├── drizzle.config.ts     # Drizzle configuration
+└── package.json
 ```
 
-## 🔌 API REST
+## 🔌 API Endpoints
 
-La aplicación incluye una API REST completa para interactuar con las preguntas y resultados del quiz.
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/questions` | GET | Get quiz questions |
+| `/api/questions/[id]` | GET | Get single question |
+| `/api/questions/validate` | GET | Validate question integrity |
+| `/api/results` | GET | Get quiz results |
+| `/api/results` | POST | Save quiz result |
+| `/api/metadata` | GET | Get app metadata |
+| `/api/health` | GET | Health check |
 
-### Endpoints Disponibles
+### Example: Get Questions
 
-#### 1. Health Check
-**GET** `/api/health`
-
-Verifica el estado de la aplicación y retorna información básica.
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "status": "healthy",
-  "timestamp": "2026-01-25T10:00:00.000Z",
-  "data": {
-    "totalQuestions": 30,
-    "metadata": { ... }
-  }
-}
-```
-
-#### 2. Obtener Preguntas
-**GET** `/api/questions`
-
-Obtiene una lista de preguntas del quiz.
-
-**Query Parameters:**
-- `level` (opcional): `niño` | `joven` | `adulto` | `mixto`
-- `count` (opcional): Número de preguntas a retornar (default: 10)
-
-**Ejemplo:**
 ```bash
-GET /api/questions?level=joven&count=5
+GET /api/questions?level=niño&count=10
 ```
 
-**Respuesta:**
+Response:
 ```json
 {
   "success": true,
   "data": [
     {
-      "id": "q-011",
-      "level": "joven",
-      "text": "¿Qué proceso permite a las plantas convertir la luz solar en energía?",
-      "choices": ["Respiración celular", "Fotosíntesis", "Fermentación", "Digestión"],
+      "id": "q-001",
+      "text": "¿Cuál es el planeta más grande?",
+      "choices": ["Marte", "Júpiter", "Saturno", "Tierra"],
       "correctIndex": 1,
-      "explanation": "La fotosíntesis es el proceso...",
-      "image": null
-    }
-  ],
-  "total": 5
-}
-```
-
-#### 3. Obtener Pregunta Individual
-**GET** `/api/questions/[id]`
-
-Obtiene una pregunta específica por su ID.
-
-**Ejemplo:**
-```bash
-GET /api/questions/q-001
-```
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "q-001",
-    "level": "niño",
-    "text": "¿Cuál es el planeta más grande de nuestro sistema solar?",
-    "choices": ["Marte", "Júpiter", "Saturno", "Tierra"],
-    "correctIndex": 1,
-    "explanation": "Júpiter es el planeta más grande...",
-    "image": null
-  }
-}
-```
-
-#### 4. Guardar Resultados
-**POST** `/api/results`
-
-Guarda los resultados de un quiz completado.
-
-**Body:**
-```json
-{
-  "level": "joven",
-  "score": 80,
-  "totalQuestions": 10,
-  "correctAnswers": 8,
-  "incorrectAnswers": 2,
-  "timeSpent": 120,
-  "answers": [
-    {
-      "questionId": "q-011",
-      "selectedIndex": 1,
-      "isCorrect": true,
-      "timeSpent": 12
+      "explanation": "Júpiter es el planeta más grande..."
     }
   ]
 }
 ```
 
-**Respuesta:**
-```json
-{
-  "success": true,
-  "message": "Resultado guardado correctamente",
-  "data": {
-    "id": "result-1737806400000",
-    "timestamp": "2026-01-25T10:00:00.000Z",
-    "score": 80,
-    "level": "joven"
-  }
+## 🌍 Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+
+## ⚙️ CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+1. **Lint & Type Check** - ESLint + TypeScript validation
+2. **Build** - Production build verification
+3. **Deploy** - Automatic deployment to Railway (on main branch)
+
+## 📝 Question System
+
+### Difficulty Levels
+
+- **Niño**: Basic questions with simple language
+- **Joven**: Intermediate questions requiring reasoning
+- **Adulto**: Advanced questions with complex concepts
+- **Mixto**: Random combination of all levels
+
+### Question Schema
+
+```typescript
+interface Question {
+  id: string;           // e.g., "q-001"
+  text: string;         // Question text
+  choices: string[];    // 4 options
+  correctIndex: number; // 0-3
+  level: 'niño' | 'joven' | 'adulto';
+  explanation: string;  // Detailed explanation
 }
-```
-
-#### 5. Obtener Resultados Guardados
-**GET** `/api/results`
-
-Obtiene la lista de resultados guardados.
-
-**Query Parameters:**
-- `level` (opcional): Filtrar por nivel
-- `limit` (opcional): Número máximo de resultados (default: 10)
-- `sortBy` (opcional): `date` | `score` (default: `date`)
-
-**Ejemplo:**
-```bash
-GET /api/results?level=joven&limit=5&sortBy=score
-```
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "totalQuestions": 10,
-      "correctAnswers": 8,
-      "incorrectAnswers": 2,
-      "score": 80,
-      "timeSpent": 120,
-      "level": "joven",
-      "answers": [...],
-      "date": "2026-01-25T10:00:00.000Z"
-    }
-  ],
-  "total": 15,
-  "showing": 5,
-  "filters": {
-    "level": "joven",
-    "limit": 5,
-    "sortBy": "score"
-  }
-}
-```
-
-#### 6. Validar Preguntas
-**GET** `/api/questions/validate`
-
-Valida la integridad de todas las preguntas del quiz.
-
-**Respuesta:**
-```json
-{
-  "success": true,
-  "valid": true,
-  "summary": {
-    "totalQuestions": 30,
-    "expectedQuestions": 30,
-    "uniqueIds": 30,
-    "hasDuplicates": false
-  },
-  "levelDistribution": {
-    "niño": 10,
-    "joven": 10,
-    "adulto": 10
-  },
-  "expectedDistribution": {
-    "niño": 10,
-    "joven": 10,
-    "adulto": 10
-  },
-  "metadataValid": true,
-  "checks": {
-    "uniqueIds": true,
-    "correctCount": true,
-    "validStructure": true,
-    "metadataMatch": true
-  }
-}
-```
-
-### Manejo de Errores
-
-Todos los endpoints retornan errores en el siguiente formato:
-
-```json
-{
-  "success": false,
-  "error": "Mensaje de error descriptivo",
-  "details": "Detalles técnicos adicionales (opcional)"
-}
-```
-
-**Códigos de Estado HTTP:**
-- `200 OK`: Operación exitosa
-- `400 Bad Request`: Datos inválidos en la petición
-- `404 Not Found`: Recurso no encontrado
-- `422 Unprocessable Entity`: Error de validación
-- `500 Internal Server Error`: Error del servidor
-
-### Persistencia de Datos
-
-Los resultados se almacenan en:
-- **Archivo local**: `data/results.json` (persistencia simple basada en archivos)
-- **localStorage**: Para acceso rápido desde el navegador
-- **Supabase** (opcional): Si se configuran las variables de entorno
-
-## 📊 Sistema de Preguntas
-
-### Generación de Preguntas
-
-Las preguntas están almacenadas en `data/questions.json` con el siguiente formato:
-
-```json
-{
-  "id": "q-001",
-  "level": "niño" | "joven" | "adulto",
-  "text": "Pregunta en español",
-  "choices": ["Opción A", "Opción B", "Opción C", "Opción D"],
-  "correctIndex": 1,
-  "explanation": "Breve explicación",
-  "image": null
-}
-```
-
-### Niveles de Dificultad
-
-- **Niño**: Preguntas básicas con lenguaje simple y hechos curiosos
-- **Joven**: Preguntas intermedias que requieren razonamiento
-- **Adulto**: Preguntas avanzadas con conceptos complejos
-- **Mixto**: Combinación aleatoria de todos los niveles
-
-### Validar Preguntas
-
-Puedes validar la integridad de las preguntas de dos formas:
-
-**1. Script de validación:**
-```bash
-node scripts/validate-questions.mjs
-```
-
-**2. Endpoint de validación:**
-```bash
-curl http://localhost:3000/api/questions/validate
-```
-
-El validador verifica:
-- ✅ IDs únicos (sin duplicados)
-- ✅ Estructura correcta de cada pregunta
-- ✅ Exactamente 4 opciones por pregunta
-- ✅ Índice de respuesta correcta válido (0-3)
-- ✅ Presencia de explicaciones
-- ✅ Coherencia con metadata
-- ✅ Total de 30 preguntas
-
-### Regenerar Preguntas
-
-Para regenerar o modificar las preguntas:
-
-1. Edita el archivo `data/questions.json`
-2. Asegúrate de seguir el formato JSON correcto
-3. Cada pregunta debe tener exactamente 4 opciones
-4. El `correctIndex` debe estar entre 0 y 3
-5. Actualiza `data/metadata.json` si cambias el número total de preguntas
-6. Ejecuta el validador para verificar: `node scripts/validate-questions.mjs`
-
-## 🎨 Sistema de Diseño
-
-### Paleta de Colores
-
-- **Coral Primario**: `#FF6B6B` (para botones principales)
-- **Turquesa**: `#4ECDC4` (para secundarios)
-- **Amarillo Sol**: `#FFE66D` (para acentos)
-- **Púrpura Vibrante**: `#A855F7` (para niveles avanzados)
-- **Gris Claro**: `#F8F9FA` (fondos)
-- **Gris Oscuro**: `#2D3436` (texto)
-
-### Componentes
-
-Todos los componentes usan:
-- Bordes redondeados (border-radius: 1rem+)
-- Sombras suaves para profundidad
-- Transiciones suaves (300ms)
-- Animaciones con Framer Motion
-- Hover effects para interactividad
-
-## 📱 PWA (Progressive Web App)
-
-### Características PWA
-
-- ✅ Instalable en dispositivos móviles
-- ✅ Funciona offline (caché básico)
-- ✅ Icono en pantalla de inicio
-- ✅ Splash screen
-- ✅ Orientación portrait
-- ✅ Service Worker registrado
-
-### Instalación en Dispositivos
-
-**Android / ChromeOS:**
-1. Abre la app en Chrome
-2. Toca el menú (⋮)
-3. Selecciona "Instalar aplicación" o "Añadir a pantalla de inicio"
-
-**iOS:**
-1. Abre la app en Safari
-2. Toca el botón Compartir
-3. Selecciona "Añadir a pantalla de inicio"
-
-### Generar Iconos PWA
-
-Los iconos se pueden generar abriendo el archivo:
-```
-public/icons/generate-icons.html
-```
-
-Este script genera automáticamente todos los tamaños necesarios (72x72 hasta 512x512).
-
-## 🔧 Configuración
-
-### Variables de Entorno
-
-No se requieren variables de entorno para la versión básica. Para integración con Supabase (opcional):
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=tu_url_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima
-```
-
-Para activar el uso de API en el frontend:
-
-```env
-NEXT_PUBLIC_USE_API=true
-```
-
-### Personalización
-
-**Cambiar colores:**
-Edita `src/app/globals.css` en la sección `:root`
-
-**Agregar más preguntas:**
-Edita `data/questions.json` y añade objetos siguiendo el formato
-
-**Cambiar temas:**
-Modifica las categorías en los componentes de nivel
-
-## 🚀 Deploy
-
-### Vercel (Recomendado)
-
-```bash
-# Conecta tu repositorio con Vercel
-vercel
-
-# O deploy manual
-vercel --prod
-```
-
-### Netlify
-
-```bash
-# Instalar CLI de Netlify
-npm install -g netlify-cli
-
-# Deploy
-netlify deploy --prod
-```
-
-### Build Estático
-
-```bash
-pnpm build
-
-# Los archivos estarán en .next/
-# Sirve con cualquier servidor web
 ```
 
 ## 🧪 Testing
 
 ```bash
-# Ejecutar linter
+# Run linter
 pnpm lint
 
-# Validar preguntas
-node scripts/validate-questions.mjs
+# Type check
+npx tsc --noEmit
 
-# Build de prueba
+# Build
 pnpm build
-
-# Test de API (requiere servidor corriendo)
-curl http://localhost:3000/api/health
-curl http://localhost:3000/api/questions/validate
 ```
 
-## 📝 Notas de Desarrollo
+## 🚀 Deployment
 
-### Optimizaciones para Chromebook ARM64
+### Railway
 
-- Sin dependencias pesadas innecesarias
-- Imágenes optimizadas (se recomienda WebP)
-- Caché de service worker para recursos estáticos
-- Lazy loading de componentes grandes
-- Renderizado eficiente con React 19
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
 
-### Compatibilidad
+# Login
+railway login
 
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-- ✅ Chrome Android
-- ✅ Safari iOS
+# Link project
+railway link
 
-## 🤝 Contribuciones
+# Deploy
+railway up
+```
 
-Las contribuciones son bienvenidas. Por favor:
+## 🤝 Contributing
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 Licencia
+## 📄 License
 
-Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+This project is MIT licensed.
 
-## 🙏 Agradecimientos
+## 👤 Author
 
-- Iconos: Lucide React
-- Componentes UI: Radix UI
-- Animaciones: Framer Motion
-- Framework: Next.js
-- Estilo: Tailwind CSS
+Albert - Full Stack Developer
 
 ---
 
-Hecho con ❤️ para aprender ciencia de forma divertida
+Built with ❤️ for learning science in a fun way

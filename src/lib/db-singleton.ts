@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from '@/db/schema';
 
-let pool: postgres.Sql<{}> | null = null;
+let pool: postgres.Sql | null = null;
 let db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
 function getPool() {

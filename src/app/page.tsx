@@ -100,7 +100,7 @@ export default function HomePage() {
               size="lg"
               className="bg-gradient-purple-pink-strong hover:opacity-90 text-white font-bold text-2xl px-12 py-8 rounded-full shadow-2xl transition-all duration-300 hover:scale-110"
             >
-              ¡Jugar Ahora! 🎮
+              ¡Jugar Ahora! 🚀
             </Button>
           </motion.div>
         </motion.div>
@@ -145,10 +145,10 @@ export default function HomePage() {
             style={{ borderWidth: '4px', borderColor: 'var(--color-yellow-light)' }}
           >
             <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-gray-800)' }}>
-              📚 30 Preguntas de Ciencia
+              🧪 100 Preguntas de Ciencia
             </h3>
             <p className="text-lg" style={{ color: 'var(--color-gray-700)' }}>
-              Explora temas de astronomía, biología, física, química y más.
+              Pon a prueba tus conocimientos en astronomía, biología, física y química.
               Elige tu nivel: Niño, Joven, Adulto o prueba el modo Mixto.
             </p>
           </Card>
