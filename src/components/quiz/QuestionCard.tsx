@@ -118,11 +118,14 @@ export function QuestionCard({
             transition={{ delay: 0.2 }}
             className="mb-6 rounded-2xl overflow-hidden shadow-lg"
           >
-            <img
-              src={question.image}
-              alt="Ilustración de la pregunta"
-              className="w-full h-auto"
-            />
+            {question.image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={question.image}
+                alt="Ilustración de la pregunta"
+                className="w-full h-auto"
+              />
+            )}
           </motion.div>
         )}
 
