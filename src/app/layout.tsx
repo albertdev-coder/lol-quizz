@@ -6,8 +6,7 @@ const outfit = Outfit({
   subsets: ['latin'],
   display: 'swap',
 });
-export default function RootLayout({ children }: { children: React.ReactNode }) 
-{
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -16,9 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode })
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className={`${outfit.variable} font-sans antialiased`}>
-        <RootClient>
-          {children}
-        </RootClient>
+        <RootClient>{children}</RootClient>
       </body>
     </html>
   );

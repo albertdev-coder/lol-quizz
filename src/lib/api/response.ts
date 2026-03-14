@@ -33,7 +33,7 @@ export function createSuccessResponse<T = any>(
   const response: ApiSuccessResponse<T> = {
     success: true,
     timestamp: new Date().toISOString(),
-    ...extras
+    ...extras,
   };
 
   if (data !== undefined) {
@@ -58,7 +58,7 @@ export function createErrorResponse(
     success: false,
     error,
     timestamp: new Date().toISOString(),
-    ...extras
+    ...extras,
   };
 
   return NextResponse.json(response, { status: statusCode });
@@ -76,7 +76,7 @@ export const ErrorCodes = {
 
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   DATABASE_ERROR: 'DATABASE_ERROR',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR'
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const;
 
 /**
@@ -87,17 +87,13 @@ export function handleZodError(error: ZodError): NextResponse<ApiErrorResponse> 
   const field = firstError.path.join('.');
   const message = firstError.message;
 
-  return createErrorResponse(
-    `Validation error: ${field ? `${field} - ` : ''}${message}`,
-    400,
-    {
-      errorCode: ErrorCodes.VALIDATION_ERROR,
-      details: error.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message
-      }))
-    }
-  );
+  return createErrorResponse(`Validation error: ${field ? `${field} - ` : ''}${message}`, 400, {
+    errorCode: ErrorCodes.VALIDATION_ERROR,
+    details: error.errors.map((e) => ({
+      field: e.path.join('.'),
+      message: e.message,
+    })),
+  });
 }
 
 /**
@@ -106,14 +102,10 @@ export function handleZodError(error: ZodError): NextResponse<ApiErrorResponse> 
 export function handleDatabaseError(error: any): NextResponse<ApiErrorResponse> {
   console.error('Database error:', error);
 
-  return createErrorResponse(
-    'Database operation failed',
-    500,
-    {
-      errorCode: ErrorCodes.DATABASE_ERROR,
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    }
-  );
+  return createErrorResponse('Database operation failed', 500, {
+    errorCode: ErrorCodes.DATABASE_ERROR,
+    details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+  });
 }
 
 /**
@@ -130,29 +122,19 @@ export function handleGenericError(error: any): NextResponse<ApiErrorResponse> {
     return handleDatabaseError(error);
   }
 
-  return createErrorResponse(
-    'An unexpected error occurred',
-    500,
-    {
-      errorCode: ErrorCodes.UNKNOWN_ERROR,
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    }
-  );
+  return createErrorResponse('An unexpected error occurred', 500, {
+    errorCode: ErrorCodes.UNKNOWN_ERROR,
+    details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+  });
 }
 
 /**
  * Create not found error response
  */
-export function createNotFoundError(
-  resource: string
-): NextResponse<ApiErrorResponse> {
-  return createErrorResponse(
-    `${resource} not found`,
-    404,
-    {
-      errorCode: ErrorCodes.NOT_FOUND
-    }
-  );
+export function createNotFoundError(resource: string): NextResponse<ApiErrorResponse> {
+  return createErrorResponse(`${resource} not found`, 404, {
+    errorCode: ErrorCodes.NOT_FOUND,
+  });
 }
 
 /**
@@ -162,32 +144,22 @@ export function createValidationError(
   message: string,
   details?: any
 ): NextResponse<ApiErrorResponse> {
-  return createErrorResponse(
-    message,
-    400,
-    {
-      errorCode: ErrorCodes.VALIDATION_ERROR,
-      details
-    }
-  );
+  return createErrorResponse(message, 400, {
+    errorCode: ErrorCodes.VALIDATION_ERROR,
+    details,
+  });
 }
 
 /**
  * Create rate limit error response
  */
-export function createRateLimitError(
-  resetTime: number
-): NextResponse<ApiErrorResponse> {
-  return createErrorResponse(
-    'Too many requests. Please try again later.',
-    429,
-    {
-      errorCode: ErrorCodes.RATE_LIMIT_EXCEEDED,
-      details: {
-        resetAt: new Date(resetTime).toISOString()
-      }
-    }
-  );
+export function createRateLimitError(resetTime: number): NextResponse<ApiErrorResponse> {
+  return createErrorResponse('Too many requests. Please try again later.', 429, {
+    errorCode: ErrorCodes.RATE_LIMIT_EXCEEDED,
+    details: {
+      resetAt: new Date(resetTime).toISOString(),
+    },
+  });
 }
 
 /**

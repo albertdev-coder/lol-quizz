@@ -21,13 +21,13 @@ export async function fetchQuestionsFromAPI(
     params.append('count', count.toString());
 
     const response = await fetch(`/api/questions?${params.toString()}`);
-    
+
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
     }
 
     const result = await response.json();
-    
+
     if (result.success && result.data) {
       return result.data as Question[];
     }
@@ -89,13 +89,13 @@ export async function fetchQuizResults(
     params.append('sortBy', sortBy);
 
     const response = await fetch(`/api/results?${params.toString()}`);
-    
+
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
     }
 
     const result = await response.json();
-    
+
     if (result.success && result.data) {
       return result.data as QuizResult[];
     }

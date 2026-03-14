@@ -89,7 +89,7 @@ export const useQuiz = (level: QuizLevel) => {
     setStartTime(Date.now());
     setQuestionStartTime(Date.now());
     setIsFinished(false);
-    
+
     const loadQuestions = async () => {
       setIsLoading(true);
       try {

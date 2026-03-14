@@ -60,9 +60,6 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": [
-    "education",
-    "games"
-  ],
+  "categories": ["education", "games"],
   "screenshots": []
 }

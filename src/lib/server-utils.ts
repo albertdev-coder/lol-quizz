@@ -20,10 +20,7 @@ export async function hashString(str: string): Promise<string> {
  * @param hashedStr - Hashed string to compare against
  * @returns Promise resolving to boolean indicating match
  */
-export async function verifyHashString(
-  str: string,
-  hashedStr: string
-): Promise<boolean> {
+export async function verifyHashString(str: string, hashedStr: string): Promise<boolean> {
   return bcrypt.compare(str, hashedStr);
 }
 
@@ -57,10 +54,7 @@ export function pbkdf2Hash(text: string): string {
  */
 export function pbkdf2Verify(text: string, hash: string): boolean {
   const computedHash = pbkdf2Hash(text);
-  return crypto.timingSafeEqual(
-    Buffer.from(computedHash, 'hex'),
-    Buffer.from(hash, 'hex')
-  );
+  return crypto.timingSafeEqual(Buffer.from(computedHash, 'hex'), Buffer.from(hash, 'hex'));
 }
 
 /**

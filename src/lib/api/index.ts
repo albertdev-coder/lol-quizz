@@ -17,7 +17,7 @@ export {
   ErrorCodes,
   type ApiSuccessResponse,
   type ApiErrorResponse,
-  type ApiResponse
+  type ApiResponse,
 } from './response';
 
 // Logger

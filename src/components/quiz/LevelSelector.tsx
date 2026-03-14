@@ -76,12 +76,17 @@ export function LevelSelector({ onSelectLevel }: LevelSelectorProps) {
                 style={{ borderWidth: '4px', borderColor: 'var(--color-purple-light)' }}
               >
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className={`p-6 rounded-full ${getLevelColor(levelData.level)} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <div
+                    className={`p-6 rounded-full ${getLevelColor(levelData.level)} shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  >
                     <Icon className="w-12 h-12 text-white" />
                   </div>
-                  
+
                   <div>
-                    <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2" style={{ color: 'var(--color-gray-800)' }}>
+                    <h3
+                      className="text-2xl font-bold mb-2 flex items-center justify-center gap-2"
+                      style={{ color: 'var(--color-gray-800)' }}
+                    >
                       <span>{levelData.emoji}</span>
                       <span>{levelData.title}</span>
                     </h3>
