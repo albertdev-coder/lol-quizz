@@ -14,10 +14,10 @@ export {
   SaveResultBodySchema,
   ApiSuccessResponseSchema,
   ApiErrorResponseSchema,
-  
+
   // TypeScript Types
   type GetQuestionsQuery,
   type GetResultsQuery,
   type SaveResultBody,
-  type UserAnswer
+  type UserAnswer,
 } from './schemas';

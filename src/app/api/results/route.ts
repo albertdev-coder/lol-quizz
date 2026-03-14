@@ -4,7 +4,7 @@ import {
   createValidationError,
   handleDatabaseError,
   handleZodError,
-  withErrorHandler
+  withErrorHandler,
 } from '@/lib/api/response';
 import { logger } from '@/lib/api/logger';
 import { SaveResultBodySchema, GetResultsQuerySchema } from '@/lib/validation/schemas';
@@ -18,29 +18,29 @@ import { saveResult, getResults } from '@/lib/db';
 export async function POST(request: NextRequest) {
   return withErrorHandler(async () => {
     const startTime = Date.now();
-    
+
     logger.apiRequest('POST', '/api/results');
-    
+
     let body: any;
-    
+
     try {
       body = await request.json();
     } catch (error) {
       logger.validationError('/api/results POST', { message: 'Invalid JSON body' });
       return createValidationError('Invalid JSON body');
     }
-    
+
     const sanitizedBody = sanitizeObject(body);
-    
+
     const validationResult = SaveResultBodySchema.safeParse(sanitizedBody);
-    
+
     if (!validationResult.success) {
       logger.validationError('/api/results POST', validationResult.error);
       return handleZodError(validationResult.error);
     }
-    
+
     const validatedData = validationResult.data;
-    
+
     try {
       const result = {
         id: `result-${Date.now()}`,
@@ -51,20 +51,20 @@ export async function POST(request: NextRequest) {
         incorrectAnswers: validatedData.incorrectAnswers,
         timeSpent: validatedData.timeSpent,
         date: new Date().toISOString(),
-        answers: validatedData.answers
+        answers: validatedData.answers,
       };
-      
+
       await saveResult(result);
-      
+
       const duration = Date.now() - startTime;
       logger.apiResponse('POST', '/api/results', 200, duration);
-      
+
       return createSuccessResponse(
         {
           id: result.id,
           timestamp: result.date,
           score: result.score,
-          level: result.level
+          level: result.level,
         },
         { message: 'Result saved successfully' }
       );
@@ -83,26 +83,26 @@ export async function GET(request: NextRequest) {
   return withErrorHandler(async () => {
     const startTime = Date.now();
     const { searchParams } = new URL(request.url);
-    
+
     logger.apiRequest('GET', '/api/results', {
       level: searchParams.get('level'),
       limit: searchParams.get('limit'),
-      sortBy: searchParams.get('sortBy')
+      sortBy: searchParams.get('sortBy'),
     });
-    
+
     const validationResult = GetResultsQuerySchema.safeParse({
       level: searchParams.get('level'),
       limit: searchParams.get('limit'),
-      sortBy: searchParams.get('sortBy')
+      sortBy: searchParams.get('sortBy'),
     });
-    
+
     if (!validationResult.success) {
       logger.validationError('/api/results GET', validationResult.error);
       return handleZodError(validationResult.error);
     }
-    
+
     const { level, limit, sortBy } = validationResult.data;
-    
+
     try {
       const results = await getResults(level, limit, sortBy);
 
@@ -112,11 +112,11 @@ export async function GET(request: NextRequest) {
       return createSuccessResponse(results, {
         total: results.length,
         showing: results.length,
-        filters: { 
-          level: level || 'all', 
-          limit, 
-          sortBy 
-        }
+        filters: {
+          level: level || 'all',
+          limit,
+          sortBy,
+        },
       });
     } catch (error: any) {
       logger.databaseError('Get results', error);

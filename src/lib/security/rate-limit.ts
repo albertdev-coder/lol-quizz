@@ -13,14 +13,17 @@ interface RateLimitEntry {
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
 // Cleanup old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of rateLimitStore.entries()) {
-    if (now > entry.resetTime) {
-      rateLimitStore.delete(key);
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [key, entry] of rateLimitStore.entries()) {
+      if (now > entry.resetTime) {
+        rateLimitStore.delete(key);
+      }
     }
-  }
-}, 5 * 60 * 1000);
+  },
+  5 * 60 * 1000
+);
 
 export interface RateLimitConfig {
   /**
@@ -28,13 +31,13 @@ export interface RateLimitConfig {
    * @default 100
    */
   maxRequests?: number;
-  
+
   /**
    * Time window in milliseconds
    * @default 60000 (1 minute)
    */
   windowMs?: number;
-  
+
   /**
    * Custom identifier function (defaults to IP)
    */
@@ -56,19 +59,19 @@ export function getClientIP(request: NextRequest): string {
   const forwardedFor = request.headers.get('x-forwarded-for');
   const realIP = request.headers.get('x-real-ip');
   const cfIP = request.headers.get('cf-connecting-ip');
-  
+
   if (forwardedFor) {
     return forwardedFor.split(',')[0].trim();
   }
-  
+
   if (realIP) {
     return realIP.trim();
   }
-  
+
   if (cfIP) {
     return cfIP.trim();
   }
-  
+
   // Fallback to a generic identifier
   return 'unknown';
 }
@@ -77,52 +80,49 @@ export function getClientIP(request: NextRequest): string {
  * Rate limiter middleware
  * Returns true if request is allowed, false if rate limited
  */
-export function rateLimit(
-  request: NextRequest,
-  config: RateLimitConfig = {}
-): RateLimitResult {
+export function rateLimit(request: NextRequest, config: RateLimitConfig = {}): RateLimitResult {
   const maxRequests = config.maxRequests ?? 100;
   const windowMs = config.windowMs ?? 60000; // 1 minute
   const identifier = config.identifier?.(request) ?? getClientIP(request);
-  
+
   const now = Date.now();
   const resetTime = now + windowMs;
-  
+
   const entry = rateLimitStore.get(identifier);
-  
+
   if (!entry || now > entry.resetTime) {
     // No entry or expired entry - create new
     rateLimitStore.set(identifier, {
       count: 1,
-      resetTime
+      resetTime,
     });
-    
+
     return {
       success: true,
       limit: maxRequests,
       remaining: maxRequests - 1,
-      resetTime
+      resetTime,
     };
   }
-  
+
   if (entry.count >= maxRequests) {
     // Rate limit exceeded
     return {
       success: false,
       limit: maxRequests,
       remaining: 0,
-      resetTime: entry.resetTime
+      resetTime: entry.resetTime,
     };
   }
-  
+
   // Increment counter
   entry.count += 1;
-  
+
   return {
     success: true,
     limit: maxRequests,
     remaining: maxRequests - entry.count,
-    resetTime: entry.resetTime
+    resetTime: entry.resetTime,
   };
 }
 
@@ -133,7 +133,7 @@ export function createRateLimitHeaders(result: RateLimitResult): Record<string, 
   return {
     'X-RateLimit-Limit': result.limit.toString(),
     'X-RateLimit-Remaining': result.remaining.toString(),
-    'X-RateLimit-Reset': new Date(result.resetTime).toISOString()
+    'X-RateLimit-Reset': new Date(result.resetTime).toISOString(),
   };
 }
 
@@ -144,18 +144,18 @@ export const RATE_LIMITS = {
   // Strict limit for write operations
   WRITE: {
     maxRequests: 20,
-    windowMs: 60000 // 20 requests per minute
+    windowMs: 60000, // 20 requests per minute
   },
-  
+
   // Normal limit for read operations
   READ: {
     maxRequests: 100,
-    windowMs: 60000 // 100 requests per minute
+    windowMs: 60000, // 100 requests per minute
   },
-  
+
   // Relaxed limit for health checks
   HEALTH: {
     maxRequests: 200,
-    windowMs: 60000 // 200 requests per minute
-  }
+    windowMs: 60000, // 200 requests per minute
+  },
 } as const;

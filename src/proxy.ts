@@ -1,10 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from 'next/server';
 
 // Configuración del proxy (Next.js 16.1.5)
 export const config = {
-  matcher: [
-    "/((?!api/health|_next/static|_next/image|favicon.ico|icons|manifest.json|sw.js).*)",
-  ],
+  matcher: ['/((?!api/health|_next/static|_next/image|favicon.ico|icons|manifest.json|sw.js).*)'],
 };
 
 // Rate limiting en memoria (simple y suficiente para tu PWA)
@@ -38,15 +36,15 @@ function rateLimit(ip: string): boolean {
 
 // Sanitización básica de URL
 function sanitizeUrl(url: string): string {
-  return url.replace(/<|>|"|'/g, "");
+  return url.replace(/<|>|"|'/g, '');
 }
 
 // Proxy principal
 export function proxy(req: NextRequest) {
   const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    req.headers.get("x-real-ip") ??
-    "unknown";
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    req.headers.get('x-real-ip') ??
+    'unknown';
 
   const url = sanitizeUrl(req.nextUrl.pathname);
 
@@ -55,16 +53,16 @@ export function proxy(req: NextRequest) {
 
   // Rate limiting
   if (!rateLimit(ip)) {
-    return new NextResponse("Too Many Requests", { status: 429 });
+    return new NextResponse('Too Many Requests', { status: 429 });
   }
 
   // Headers de seguridad
   const res = NextResponse.next();
-  res.headers.set("X-Frame-Options", "DENY");
-  res.headers.set("X-Content-Type-Options", "nosniff");
-  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  res.headers.set("X-XSS-Protection", "1; mode=block");
+  res.headers.set('X-Frame-Options', 'DENY');
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.headers.set('X-XSS-Protection', '1; mode=block');
 
   return res;
 }

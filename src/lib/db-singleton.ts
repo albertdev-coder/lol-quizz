@@ -8,12 +8,12 @@ let db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 function getPool() {
   if (!pool) {
     const databaseUrl = process.env.DATABASE_URL;
-    
+
     if (!databaseUrl) {
       throw new Error('DATABASE_URL environment variable is not set');
     }
 
-    pool = postgres(databaseUrl, { 
+    pool = postgres(databaseUrl, {
       max: 20,
       idle_timeout: 20,
       connect_timeout: 2000,

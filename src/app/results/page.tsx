@@ -24,7 +24,7 @@ export default function ResultsPage() {
     if (savedResults) {
       const parsedResults = JSON.parse(savedResults) as QuizResult;
       setResults(parsedResults);
-      
+
       // Mostrar confetti si el score es bueno
       if (parsedResults.score >= 70) {
         setShowConfetti(true);
@@ -53,19 +53,21 @@ export default function ResultsPage() {
 
   const handleShare = () => {
     if (!results) return;
-    
+
     const text = `¡Obtuve ${results.score}% en el Quiz de Ciencia! ${getScoreMessage(results.score).emoji}`;
-    
+
     if (navigator.share) {
-      navigator.share({
-        title: 'Quiz Ciencia - Mis Resultados',
-        text: text,
-        url: window.location.origin,
-      }).catch(() => {
-        // Si falla, copiar al portapapeles
-        navigator.clipboard.writeText(text);
-        alert('Resultado copiado al portapapeles');
-      });
+      navigator
+        .share({
+          title: 'Quiz Ciencia - Mis Resultados',
+          text: text,
+          url: window.location.origin,
+        })
+        .catch(() => {
+          // Si falla, copiar al portapapeles
+          navigator.clipboard.writeText(text);
+          alert('Resultado copiado al portapapeles');
+        });
     } else {
       navigator.clipboard.writeText(text);
       alert('Resultado copiado al portapapeles');
@@ -80,7 +82,7 @@ export default function ResultsPage() {
 
   // Obtener detalles de cada pregunta
   const getQuestionById = (id: string) => {
-    return questions.find(q => q.id === id);
+    return questions.find((q) => q.id === id);
   };
 
   return (
@@ -125,16 +127,21 @@ export default function ResultsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card 
-            className="p-8 rounded-3xl shadow-2xl bg-white" 
+          <Card
+            className="p-8 rounded-3xl shadow-2xl bg-white"
             style={{ borderWidth: '4px', borderColor: 'var(--color-purple-light)' }}
           >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className={`w-16 h-16 mx-auto mb-3 rounded-full ${getLevelColor(results.level)} flex items-center justify-center shadow-lg`}>
+                <div
+                  className={`w-16 h-16 mx-auto mb-3 rounded-full ${getLevelColor(results.level)} flex items-center justify-center shadow-lg`}
+                >
                   <Trophy className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-3xl font-bold mb-1" style={{ color: 'var(--color-purple-dark)' }}>
+                <div
+                  className="text-3xl font-bold mb-1"
+                  style={{ color: 'var(--color-purple-dark)' }}
+                >
                   {results.score}%
                 </div>
                 <div className="text-sm font-medium" style={{ color: 'var(--color-gray-600)' }}>
@@ -143,7 +150,7 @@ export default function ResultsPage() {
               </div>
 
               <div className="text-center">
-                <div 
+                <div
                   className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center shadow-lg"
                   style={{ background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)' }}
                 >
@@ -158,7 +165,7 @@ export default function ResultsPage() {
               </div>
 
               <div className="text-center">
-                <div 
+                <div
                   className="w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center shadow-lg"
                   style={{ background: 'linear-gradient(135deg, #f87171 0%, #f472b6 100%)' }}
                 >
@@ -176,7 +183,10 @@ export default function ResultsPage() {
                 <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-blue-cyan flex items-center justify-center shadow-lg">
                   <Clock className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-3xl font-bold mb-1" style={{ color: 'var(--color-blue-dark)' }}>
+                <div
+                  className="text-3xl font-bold mb-1"
+                  style={{ color: 'var(--color-blue-dark)' }}
+                >
                   {formatTime(results.timeSpent)}
                 </div>
                 <div className="text-sm font-medium" style={{ color: 'var(--color-gray-600)' }}>
@@ -185,16 +195,17 @@ export default function ResultsPage() {
               </div>
             </div>
 
-            <div 
-              className="mt-6 pt-6 text-center" 
+            <div
+              className="mt-6 pt-6 text-center"
               style={{ borderTopWidth: '2px', borderTopColor: 'var(--color-purple-50)' }}
             >
-              <div 
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full" 
-                style={{ 
-                  background: 'linear-gradient(135deg, var(--color-purple-50) 0%, var(--color-pink-50) 100%)',
+              <div
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full"
+                style={{
+                  background:
+                    'linear-gradient(135deg, var(--color-purple-50) 0%, var(--color-pink-50) 100%)',
                   borderWidth: '2px',
-                  borderColor: 'var(--color-purple-light)'
+                  borderColor: 'var(--color-purple-light)',
                 }}
               >
                 <span className="text-2xl">{getLevelEmoji(results.level)}</span>
@@ -213,10 +224,13 @@ export default function ResultsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: 'var(--color-gray-800)' }}>
+            <h2
+              className="text-2xl font-bold mb-4 text-center"
+              style={{ color: 'var(--color-gray-800)' }}
+            >
               📝 Resumen de Respuestas
             </h2>
-            
+
             <div className="space-y-4">
               {results.answers.map((answer, index) => {
                 const question = getQuestionById(answer.questionId);
@@ -229,11 +243,11 @@ export default function ResultsPage() {
                     style={{
                       borderWidth: '3px',
                       borderColor: answer.isCorrect ? '#86efac' : '#fca5a5',
-                      backgroundColor: answer.isCorrect ? '#f0fdf4' : '#fef2f2'
+                      backgroundColor: answer.isCorrect ? '#f0fdf4' : '#fef2f2',
                     }}
                   >
                     <div className="flex items-start gap-4">
-                      <div 
+                      <div
                         className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: answer.isCorrect ? '#22c55e' : '#ef4444' }}
                       >
@@ -245,27 +259,34 @@ export default function ResultsPage() {
                       </div>
 
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--color-gray-800)' }}>
+                        <h3
+                          className="font-bold text-lg mb-2"
+                          style={{ color: 'var(--color-gray-800)' }}
+                        >
                           {index + 1}. {question.text}
                         </h3>
-                        
+
                         <div className="space-y-2 mb-3">
                           <p style={{ color: 'var(--color-gray-700)' }}>
                             <strong>Tu respuesta:</strong> {question.choices[answer.selectedIndex]}
                           </p>
                           {!answer.isCorrect && (
                             <p style={{ color: '#16a34a' }}>
-                              <strong>Respuesta correcta:</strong> {question.choices[question.correctIndex]}
+                              <strong>Respuesta correcta:</strong>{' '}
+                              {question.choices[question.correctIndex]}
                             </p>
                           )}
                         </div>
 
-                        <div 
-                          className="p-4 bg-white rounded-lg" 
+                        <div
+                          className="p-4 bg-white rounded-lg"
                           style={{ borderWidth: '2px', borderColor: 'var(--color-blue-light)' }}
                         >
                           <p style={{ color: 'var(--color-gray-700)' }}>
-                            <strong style={{ color: 'var(--color-blue-dark)' }}>💡 Explicación:</strong> {question.explanation}
+                            <strong style={{ color: 'var(--color-blue-dark)' }}>
+                              💡 Explicación:
+                            </strong>{' '}
+                            {question.explanation}
                           </p>
                         </div>
                       </div>
@@ -298,10 +319,10 @@ export default function ResultsPage() {
             size="lg"
             variant="outline"
             className="hover:opacity-80 font-bold text-lg px-8 py-6 rounded-full shadow-lg"
-            style={{ 
-              borderWidth: '3px', 
+            style={{
+              borderWidth: '3px',
               borderColor: 'var(--color-purple-light)',
-              color: 'var(--color-purple-dark)'
+              color: 'var(--color-purple-dark)',
             }}
           >
             <Home className="w-5 h-5 mr-2" />
@@ -313,10 +334,10 @@ export default function ResultsPage() {
             size="lg"
             variant="outline"
             className="hover:opacity-80 font-bold text-lg px-8 py-6 rounded-full shadow-lg"
-            style={{ 
-              borderWidth: '3px', 
+            style={{
+              borderWidth: '3px',
               borderColor: 'var(--color-blue-light)',
-              color: 'var(--color-blue-dark)'
+              color: 'var(--color-blue-dark)',
             }}
           >
             <Share2 className="w-5 h-5 mr-2" />

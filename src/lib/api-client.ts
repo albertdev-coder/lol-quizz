@@ -50,10 +50,7 @@ async function refreshToken(): Promise<boolean> {
 function redirectToLogin() {
   if (typeof window !== 'undefined') {
     const currentPath = window.location.pathname;
-    if (
-      currentPath === authConfig.loginPath ||
-      currentPath === `${authConfig.loginPath}/`
-    ) {
+    if (currentPath === authConfig.loginPath || currentPath === `${authConfig.loginPath}/`) {
       return;
     }
     const loginUrl = `${authConfig.loginPath}?redirect=${encodeURIComponent(currentPath)}`;
@@ -79,10 +76,7 @@ async function apiRequest<T = any>(
     const result: ApiResponse<T> = await response.json();
 
     // Auth-enabled: handle token missing
-    if (
-      AUTH_ENABLED &&
-      [AUTH_CODE.TOKEN_MISSING].includes(result.errorCode || '')
-    ) {
+    if (AUTH_ENABLED && [AUTH_CODE.TOKEN_MISSING].includes(result.errorCode || '')) {
       // Unauthorized, need login
       throw new ApiError(401, 'need login', AUTH_CODE.TOKEN_MISSING);
     }
@@ -157,9 +151,7 @@ async function apiRequest<T = any>(
 
 export const api = {
   get: <T = any>(endpoint: string, params?: Record<string, string>) => {
-    const url = params
-      ? `${endpoint}?${new URLSearchParams(params).toString()}`
-      : endpoint;
+    const url = params ? `${endpoint}?${new URLSearchParams(params).toString()}` : endpoint;
     return apiRequest<T>(url, { method: 'GET' });
   },
 
@@ -175,8 +167,7 @@ export const api = {
       body: data ? JSON.stringify(data) : undefined,
     }),
 
-  delete: <T = any>(endpoint: string) =>
-    apiRequest<T>(endpoint, { method: 'DELETE' }),
+  delete: <T = any>(endpoint: string) => apiRequest<T>(endpoint, { method: 'DELETE' }),
 };
 
 export { ApiError };

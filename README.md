@@ -1,11 +1,12 @@
 # 🧪 Quiz Ciencia - Science Quiz Application
 
-An interactive science quiz web application to test knowledge in astronomy, biology, physics, and chemistry. Built with modern technologies for a fast, accessible, and professional user experience.
+[![CI/CD](https://github.com/albertdev-coder/lol-quizz/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/albertdev-coder/lol-quizz/actions/workflows/ci-cd.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-0ea5e9)](https://tailwindcss.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](https://opensource.org/licenses/MIT)
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+An interactive science quiz web application to test knowledge in astronomy, biology, physics, and chemistry. Built with modern technologies for a fast, accessible, and professional user experience.
 
 ## 🌟 Features
 
@@ -20,17 +21,17 @@ An interactive science quiz web application to test knowledge in astronomy, biol
 
 ## 🛠️ Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| **Framework** | Next.js 16 (App Router) |
-| **Language** | TypeScript |
-| **Database** | PostgreSQL (Neon) |
-| **ORM** | Drizzle ORM |
-| **UI** | React 19, Radix UI |
-| **Styling** | Tailwind CSS 4 |
-| **Animations** | Framer Motion |
-| **Validation** | Zod |
-| **Deployment** | Railway |
+| Category       | Technology              |
+| -------------- | ----------------------- |
+| **Framework**  | Next.js 16 (App Router) |
+| **Language**   | TypeScript              |
+| **Database**   | PostgreSQL (Neon)       |
+| **ORM**        | Drizzle ORM             |
+| **UI**         | React 19, Radix UI      |
+| **Styling**    | Tailwind CSS 4          |
+| **Animations** | Framer Motion           |
+| **Validation** | Zod                     |
+| **Deployment** | Railway                 |
 
 ## 📦 Installation
 
@@ -55,14 +56,14 @@ pnpm dev
 
 ## 🔧 Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start development server |
-| `pnpm build` | Build for production |
-| `pnpm start` | Start production server |
-| `pnpm lint` | Run ESLint |
-| `pnpm db:push` | Push schema to database |
-| `pnpm db:studio` | Open Drizzle Studio |
+| Command          | Description              |
+| ---------------- | ------------------------ |
+| `pnpm dev`       | Start development server |
+| `pnpm build`     | Build for production     |
+| `pnpm start`     | Start production server  |
+| `pnpm lint`      | Run ESLint               |
+| `pnpm db:push`   | Push schema to database  |
+| `pnpm db:studio` | Open Drizzle Studio      |
 
 ## 📁 Project Structure
 
@@ -94,15 +95,15 @@ lol-quizz/
 
 ## 🔌 API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/questions` | GET | Get quiz questions |
-| `/api/questions/[id]` | GET | Get single question |
-| `/api/questions/validate` | GET | Validate question integrity |
-| `/api/results` | GET | Get quiz results |
-| `/api/results` | POST | Save quiz result |
-| `/api/metadata` | GET | Get app metadata |
-| `/api/health` | GET | Health check |
+| Endpoint                  | Method | Description                 |
+| ------------------------- | ------ | --------------------------- |
+| `/api/questions`          | GET    | Get quiz questions          |
+| `/api/questions/[id]`     | GET    | Get single question         |
+| `/api/questions/validate` | GET    | Validate question integrity |
+| `/api/results`            | GET    | Get quiz results            |
+| `/api/results`            | POST   | Save quiz result            |
+| `/api/metadata`           | GET    | Get app metadata            |
+| `/api/health`             | GET    | Health check                |
 
 ### Example: Get Questions
 
@@ -111,6 +112,7 @@ GET /api/questions?level=niño&count=10
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -128,8 +130,8 @@ Response:
 
 ## 🌍 Environment Variables
 
-| Variable | Description |
-|----------|-------------|
+| Variable       | Description                  |
+| -------------- | ---------------------------- |
 | `DATABASE_URL` | PostgreSQL connection string |
 
 ## ⚙️ CI/CD Pipeline
@@ -153,12 +155,12 @@ This project uses GitHub Actions for continuous integration and deployment:
 
 ```typescript
 interface Question {
-  id: string;           // e.g., "q-001"
-  text: string;         // Question text
-  choices: string[];    // 4 options
+  id: string; // e.g., "q-001"
+  text: string; // Question text
+  choices: string[]; // 4 options
   correctIndex: number; // 0-3
   level: 'niño' | 'joven' | 'adulto';
-  explanation: string;  // Detailed explanation
+  explanation: string; // Detailed explanation
 }
 ```
 

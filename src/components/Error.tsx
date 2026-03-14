@@ -3,11 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
-export default function Error({
-  error,
-}: {
-  error: Error & { digest?: string; cause?: any };
-}) {
+export default function Error({ error }: { error: Error & { digest?: string; cause?: any } }) {
   const [errorDetails, setErrorDetails] = useState<Record<string, any>>({});
 
   useEffect(() => {

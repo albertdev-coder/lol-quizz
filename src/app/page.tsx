@@ -85,8 +85,11 @@ export default function HomePage() {
           <h1 className="text-5xl md:text-7xl font-bold mb-4 text-gradient-purple-pink-orange">
             Quiz Ciencia
           </h1>
-          
-          <p className="text-xl md:text-2xl font-medium mb-8" style={{ color: 'var(--color-gray-700)' }}>
+
+          <p
+            className="text-xl md:text-2xl font-medium mb-8"
+            style={{ color: 'var(--color-gray-700)' }}
+          >
             ¡Descubre cuánto sabes de ciencia de forma divertida! 🚀
           </p>
 
@@ -117,16 +120,19 @@ export default function HomePage() {
                 transition={{ delay: 0.4 + index * 0.1 }}
                 whileHover={{ y: -10 }}
               >
-                <Card className="p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 bg-white" style={{ borderWidth: '4px', borderColor: 'var(--color-purple-light)' }}>
-                  <div className={`w-16 h-16 rounded-full ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                <Card
+                  className="p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 bg-white"
+                  style={{ borderWidth: '4px', borderColor: 'var(--color-purple-light)' }}
+                >
+                  <div
+                    className={`w-16 h-16 rounded-full ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}
+                  >
                     <Icon className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-gray-800)' }}>
                     {feature.title}
                   </h3>
-                  <p style={{ color: 'var(--color-gray-600)' }}>
-                    {feature.description}
-                  </p>
+                  <p style={{ color: 'var(--color-gray-600)' }}>{feature.description}</p>
                 </Card>
               </motion.div>
             );
@@ -140,16 +146,16 @@ export default function HomePage() {
           transition={{ delay: 0.8 }}
           className="text-center"
         >
-          <Card 
-            className="p-8 rounded-3xl bg-gradient-yellow-orange shadow-xl" 
+          <Card
+            className="p-8 rounded-3xl bg-gradient-yellow-orange shadow-xl"
             style={{ borderWidth: '4px', borderColor: 'var(--color-yellow-light)' }}
           >
             <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-gray-800)' }}>
               🧪 100 Preguntas de Ciencia
             </h3>
             <p className="text-lg" style={{ color: 'var(--color-gray-700)' }}>
-              Pon a prueba tus conocimientos en astronomía, biología, física y química.
-              Elige tu nivel: Niño, Joven, Adulto o prueba el modo Mixto.
+              Pon a prueba tus conocimientos en astronomía, biología, física y química. Elige tu
+              nivel: Niño, Joven, Adulto o prueba el modo Mixto.
             </p>
           </Card>
         </motion.div>

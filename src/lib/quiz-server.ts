@@ -24,32 +24,29 @@ export async function getAllQuestions(): Promise<Question[]> {
 
 export async function getQuestionsByLevel(level: QuizLevel): Promise<Question[]> {
   const db = getDB();
-  
+
   let rows;
   if (level === 'mixto') {
     rows = await db.select().from(questions);
   } else {
     rows = await db.select().from(questions).where(eq(questions.level, level));
   }
-  
+
   return rows.map(mapToQuestion);
 }
 
-export async function getRandomQuestions(
-  level?: QuizLevel,
-  count?: number
-): Promise<Question[]> {
+export async function getRandomQuestions(level?: QuizLevel, count?: number): Promise<Question[]> {
   const db = getDB();
-  
+
   let rows;
   if (!level || level === 'mixto') {
     rows = await db.select().from(questions);
   } else {
     rows = await db.select().from(questions).where(eq(questions.level, level));
   }
-  
+
   const mapped = rows.map(mapToQuestion);
-  
+
   for (let i = mapped.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [mapped[i], mapped[j]] = [mapped[j], mapped[i]];

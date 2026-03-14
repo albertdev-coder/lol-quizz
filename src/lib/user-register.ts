@@ -14,10 +14,10 @@ export async function userRegisterCallback(user: {
   // Placeholder for future implementation
   // Example: Create user in database, send welcome email, etc.
   void user;
-  
+
   // Uncomment and implement as needed:
   // const adminToken = await generateAdminUserToken();
   // const xxxCrud = new CrudOperations("xxxx", adminToken);
-  
+
   return;
 }

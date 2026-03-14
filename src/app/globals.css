@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   /* Colores principales vibrantes del quiz */
@@ -6,7 +6,7 @@
   --color-turquoise: #4ecdc4;
   --color-yellow: #ffe66d;
   --color-purple: #a06cd5;
-  
+
   /* Gradientes y tonos */
   --color-blue-light: #60a5fa;
   --color-blue-dark: #2563eb;
@@ -20,14 +20,14 @@
   --color-orange-dark: #f97316;
   --color-yellow-light: #fef08a;
   --color-yellow-dark: #eab308;
-  
+
   /* Tonos suaves para fondos */
   --color-purple-50: #faf5ff;
   --color-pink-50: #fdf2f8;
   --color-orange-50: #fff7ed;
   --color-blue-50: #eff6ff;
   --color-yellow-50: #fefce8;
-  
+
   /* Neutrales */
   --color-neutral-light: #fafafa;
   --color-neutral-dark: #2d3748;
@@ -37,7 +37,7 @@
   --color-gray-600: #4b5563;
   --color-gray-700: #374151;
   --color-gray-800: #1f2937;
-  
+
   /* Variables del sistema Radix */
   --color-background: #ffffff;
   --color-foreground: var(--color-neutral-dark);
@@ -58,7 +58,7 @@
   --color-border: #e5e7eb;
   --color-input: #e5e7eb;
   --color-ring: var(--color-coral);
-  
+
   --radius-sm: 0.5rem;
   --radius-md: 1rem;
   --radius-lg: 1.5rem;
@@ -71,13 +71,27 @@
 }
 
 body {
-  background: linear-gradient(135deg, var(--color-purple-50) 0%, var(--color-pink-50) 50%, var(--color-orange-50) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-purple-50) 0%,
+    var(--color-pink-50) 50%,
+    var(--color-orange-50) 100%
+  );
   color: var(--color-foreground);
   min-height: 100vh;
-  font-family: var(--font-outfit), system-ui, -apple-system, sans-serif;
+  font-family:
+    var(--font-outfit),
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 700;
 }
 
@@ -91,7 +105,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes bounce-gentle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -104,7 +119,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes wiggle {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(-3deg);
   }
   50% {
@@ -117,7 +133,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes pulse-scale {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -143,7 +160,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-gradient-purple-pink-orange {
-  background: linear-gradient(90deg, var(--color-purple-dark) 0%, var(--color-pink-dark) 50%, var(--color-orange-dark) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--color-purple-dark) 0%,
+    var(--color-pink-dark) 50%,
+    var(--color-orange-dark) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

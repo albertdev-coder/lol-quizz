@@ -7,12 +7,12 @@ import { metadata } from '@/db/schema';
 export async function GET(request: NextRequest) {
   return withErrorHandler(async () => {
     const startTime = Date.now();
-    
+
     logger.apiRequest('GET', '/api/metadata');
-    
+
     try {
       const db = getDB();
-      
+
       const rows = await db.select().from(metadata);
 
       const metadataObj: Record<string, unknown> = {};

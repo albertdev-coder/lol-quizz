@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
-import { 
-  createSuccessResponse, 
-  handleDatabaseError, 
+import {
+  createSuccessResponse,
+  handleDatabaseError,
   handleZodError,
-  withErrorHandler 
+  withErrorHandler,
 } from '@/lib/api/response';
 import { logger } from '@/lib/api/logger';
 import { GetQuestionsQuerySchema } from '@/lib/validation/schemas';
@@ -17,24 +17,24 @@ export async function GET(request: NextRequest) {
   return withErrorHandler(async () => {
     const startTime = Date.now();
     const { searchParams } = new URL(request.url);
-    
+
     logger.apiRequest('GET', '/api/questions', {
       level: searchParams.get('level'),
-      count: searchParams.get('count')
+      count: searchParams.get('count'),
     });
-    
+
     const validationResult = GetQuestionsQuerySchema.safeParse({
       level: searchParams.get('level'),
-      count: searchParams.get('count')
+      count: searchParams.get('count'),
     });
-    
+
     if (!validationResult.success) {
       logger.validationError('/api/questions', validationResult.error);
       return handleZodError(validationResult.error);
     }
-    
+
     const { level, count } = validationResult.data;
-    
+
     try {
       const questions = await getQuestions(level, count);
 
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       return createSuccessResponse(questions, {
         total: questions.length,
         requested: count,
-        level: level || 'all'
+        level: level || 'all',
       });
     } catch (error: any) {
       logger.databaseError('Get questions', error);

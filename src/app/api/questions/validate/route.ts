@@ -1,9 +1,5 @@
 import { NextRequest } from 'next/server';
-import {
-  createSuccessResponse,
-  handleDatabaseError,
-  withErrorHandler
-} from '@/lib/api/response';
+import { createSuccessResponse, handleDatabaseError, withErrorHandler } from '@/lib/api/response';
 import { logger } from '@/lib/api/logger';
 import { getDB } from '@/lib/db-singleton';
 import { questions, metadata } from '@/db/schema';
@@ -11,12 +7,12 @@ import { questions, metadata } from '@/db/schema';
 export async function GET(request: NextRequest) {
   return withErrorHandler(async () => {
     const startTime = Date.now();
-    
+
     logger.apiRequest('GET', '/api/questions/validate');
 
     try {
       const db = getDB();
-      
+
       const allQuestions = await db.select().from(questions);
 
       const metadataRows = await db.select().from(metadata);
@@ -39,9 +35,7 @@ export async function GET(request: NextRequest) {
       const ids = allQuestions.map((q) => q.id);
       const uniqueIds = new Set(ids);
       const hasDuplicates = ids.length !== uniqueIds.size;
-      const duplicates = hasDuplicates 
-        ? ids.filter((id, idx) => ids.indexOf(id) !== idx)
-        : [];
+      const duplicates = hasDuplicates ? ids.filter((id, idx) => ids.indexOf(id) !== idx) : [];
 
       const levelCounts: Record<string, number> = { niño: 0, joven: 0, adulto: 0 };
       allQuestions.forEach((q) => {
@@ -62,14 +56,14 @@ export async function GET(request: NextRequest) {
           expectedQuestions: metadataObj.totalQuestions,
           uniqueIds: uniqueIds.size,
           hasDuplicates,
-          ...(duplicates.length > 0 && { duplicates })
+          ...(duplicates.length > 0 && { duplicates }),
         },
         levelDistribution: levelCounts,
         expectedDistribution: metadataObj.levels || {},
         checks: {
           uniqueIds: !hasDuplicates,
           correctCount: allQuestions.length === metadataObj.totalQuestions,
-        }
+        },
       };
 
       return createSuccessResponse(validationResult);

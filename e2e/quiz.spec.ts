@@ -20,10 +20,10 @@ test.describe('Quiz Application', () => {
 
   test('should have responsive design', async ({ page }) => {
     await page.goto('/');
-    
+
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(page.getByText('Quiz Ciencia')).toBeVisible();
-    
+
     await page.setViewportSize({ width: 1920, height: 1080 });
     await expect(page.getByText('Quiz Ciencia')).toBeVisible();
   });
